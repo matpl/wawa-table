@@ -6,13 +6,29 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 var WawaGrid_1;
 import { LitElement, customElement, html, property } from "lit-element";
+import { RowTemplate } from "./row-template";
+import { HeaderTemplate } from "./header-template";
 let WawaGrid = WawaGrid_1 = class WawaGrid extends LitElement {
     constructor() {
         super();
         this.items = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
         this.fetching = false;
-        this.template = "";
-        this.template = document.getElementById("yoyo").innerHTML;
+        this.rowTemplate = "";
+        this.headerTemplate = "";
+        for (let i = 0; i < this.children.length; i++) {
+            if (this.children[i] instanceof HeaderTemplate) {
+                if (this.headerTemplate != "") {
+                    console.error("Only one header-template required");
+                }
+                this.headerTemplate = this.children[i].innerHTML.replace("`", "\\`");
+            }
+            else if (this.children[i] instanceof RowTemplate) {
+                if (this.headerTemplate != "") {
+                    console.error("Only one row-template required");
+                }
+                this.rowTemplate = this.children[i].innerHTML.replace("`", "\\`");
+            }
+        }
     }
     onScroll(e) {
         let div = e.composedPath()[0];
@@ -36,9 +52,8 @@ let WawaGrid = WawaGrid_1 = class WawaGrid extends LitElement {
         return html `
         <style>
             div {
-                height: 600px;
+                height: 100%;
                 overflow-y: auto;
-                background-color: green;
             }
         </style>
         `;
@@ -50,14 +65,21 @@ let WawaGrid = WawaGrid_1 = class WawaGrid extends LitElement {
     }
     renderThing(tot) {
         let wawa = { item: { name: "crap123123123", total: tot } };
-        const stringArray = [this.interpolate(this.template, wawa)];
-        stringArray.raw = [this.interpolate(this.template, wawa)];
+        const stringArray = [this.interpolate(this.rowTemplate, wawa)];
+        stringArray.raw = [this.interpolate(this.rowTemplate, wawa)];
+        return html(stringArray);
+    }
+    renderHeader() {
+        const template = this.interpolate(this.headerTemplate, {});
+        const stringArray = [template];
+        stringArray.raw = [template];
         return html(stringArray);
     }
     render() {
         console.log(this.items.length);
         return html `${this.renderStyles()}<div @scroll=${this.onScroll}>
             <table>
+                ${this.renderHeader()}
                 ${this.items.map(i => html `<tr style='height:50px;'><td>${this.renderThing(i)}</td></tr>`)}
             </table>
             ${this.fetching ? html `<span style='position:absolute;top:0px;background-color:pink;'>fetching...</span>` : html ``}

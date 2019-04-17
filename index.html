@@ -1,8 +1,25 @@
 <html>
     <head>
-        <script type="module" src="./grid.js"></script>
+        <script type="module" src="./wawa-grid.js"></script>
     </head>
     <body>
-        <wawa-grid></wawa-grid>
+        <wawa-grid>
+            <template is="header-template">
+                <tr>
+                    <th>Name</th>
+                    <th>Crap</th>
+                </tr>
+            </template>
+            <template is="row-template">
+                <tr style="background-color:${item.total % 2 === 0 ? 'red' : 'blue'};">
+                    <td>
+                        <h1>${item.name + "qasaasdasd"}</h1>
+                    </td>
+                    <td>
+                        <h1>${item.total}</h1>
+                    </td>
+                </tr>
+            </template>
+        </wawa-grid>
     </body>
 </html>
