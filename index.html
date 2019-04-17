@@ -1,9 +1,21 @@
 <html>
     <head>
         <script type="module" src="./wawa-grid.js"></script>
+        <script>
+            setTimeout(() => {
+                document.getElementById("wawaGrid").fetchData = async (pageNumber, pageSize) => {
+                    let items = [];
+                    for(let i = 0; i < pageSize; i++) {
+                        items.push({name: "CRAP " + i});
+                    }
+
+                    return items;
+                }
+            }, 5000);
+        </script>
     </head>
     <body>
-        <wawa-grid>
+        <wawa-grid id="wawaGrid">
             <template is="header-template">
                 <tr>
                     <th>Name</th>
@@ -12,8 +24,8 @@
             </template>
             <template is="row-template">
                 <tr style="background-color:${item.total % 2 === 0 ? 'red' : 'blue'};">
-                    <td>
-                        <h1>${item.name + "qasaasdasd"}</h1>
+                    <td @click="${item.wawa}">
+                        <h1>${item + "qasaasdasd"}</h1>
                     </td>
                     <td>
                         <h1>${item.total}</h1>

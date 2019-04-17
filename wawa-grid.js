@@ -4,15 +4,18 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-var WawaGrid_1;
 import { LitElement, customElement, html, property } from "lit-element";
 import { RowTemplate } from "./row-template";
 import { HeaderTemplate } from "./header-template";
-let WawaGrid = WawaGrid_1 = class WawaGrid extends LitElement {
+let WawaGrid = class WawaGrid extends LitElement {
     constructor() {
         super();
-        this.items = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+        this.items = [];
         this.fetching = false;
+        this.scrollOffset = 50;
+        this.pageSize = 3;
+        this.pageNumber = 0;
+        this.fetchData = undefined;
         this.rowTemplate = "";
         this.headerTemplate = "";
         for (let i = 0; i < this.children.length; i++) {
@@ -23,29 +26,44 @@ let WawaGrid = WawaGrid_1 = class WawaGrid extends LitElement {
                 this.headerTemplate = this.children[i].innerHTML.replace("`", "\\`");
             }
             else if (this.children[i] instanceof RowTemplate) {
-                if (this.headerTemplate != "") {
+                if (this.rowTemplate != "") {
                     console.error("Only one row-template required");
                 }
                 this.rowTemplate = this.children[i].innerHTML.replace("`", "\\`");
             }
         }
     }
+    fetch() {
+        console.log('FETCH');
+        if (!this.fetching && this.fetchData) {
+            this.fetching = true;
+            this.fetchData(this.pageNumber, this.pageSize).then(items => {
+                for (let i = 0; i < items.length; i++) {
+                    this.items.push(items[i]);
+                }
+                this.pageNumber++;
+                this.fetching = false;
+                if (items.length > 0) {
+                    let div = this.renderRoot.querySelector("div");
+                    if (div.scrollHeight <= div.clientHeight) {
+                        this.fetch();
+                    }
+                }
+            });
+        }
+    }
     onScroll(e) {
         let div = e.composedPath()[0];
-        if (!this.fetching && div.scrollHeight - div.clientHeight - div.scrollTop < WawaGrid_1.fetchOffset) {
-            this.fetching = true;
-            // simulate lengthy fetch
-            let p = new Promise((resolve, reject) => {
-                setTimeout(() => {
-                    for (let i = 0; i < 20; i++) {
-                        this.items.push(i);
-                    }
-                    resolve();
-                }, 300);
-            });
-            p.then(() => {
-                this.fetching = false;
-            });
+        if (div.scrollHeight - div.clientHeight - div.scrollTop < this.scrollOffset) {
+            this.fetch();
+        }
+    }
+    updated(_changedProperties) {
+        super.updated(_changedProperties);
+        if (_changedProperties.has("fetchData")) {
+            this.items = [];
+            this.pageNumber = 0;
+            this.fetch();
         }
     }
     renderStyles() {
@@ -63,11 +81,12 @@ let WawaGrid = WawaGrid_1 = class WawaGrid extends LitElement {
         const vals = Object.values(item);
         return new Function(...names, `return \`${template}\`;`)(...vals);
     }
-    renderThing(tot) {
-        let wawa = { item: { name: "crap123123123", total: tot } };
-        const stringArray = [this.interpolate(this.rowTemplate, wawa)];
+    renderRow(item) {
+        /*let wawa = {item: item};
+        const stringArray = [this.interpolate(this.rowTemplate, wawa)] as any;
         stringArray.raw = [this.interpolate(this.rowTemplate, wawa)];
-        return html(stringArray);
+        return html(stringArray as TemplateStringsArray);*/
+        return eval('html`' + this.rowTemplate + '`');
     }
     renderHeader() {
         const template = this.interpolate(this.headerTemplate, {});
@@ -76,24 +95,31 @@ let WawaGrid = WawaGrid_1 = class WawaGrid extends LitElement {
         return html(stringArray);
     }
     render() {
-        console.log(this.items.length);
         return html `${this.renderStyles()}<div @scroll=${this.onScroll}>
             <table>
                 ${this.renderHeader()}
-                ${this.items.map(i => html `<tr style='height:50px;'><td>${this.renderThing(i)}</td></tr>`)}
+                ${this.items.map(i => html `${this.renderRow(i)}`)}
             </table>
             ${this.fetching ? html `<span style='position:absolute;top:0px;background-color:pink;'>fetching...</span>` : html ``}
         </div>`;
     }
 };
-WawaGrid.fetchOffset = 50;
 __decorate([
     property({ type: Array })
 ], WawaGrid.prototype, "items", void 0);
 __decorate([
     property({ type: Boolean })
 ], WawaGrid.prototype, "fetching", void 0);
-WawaGrid = WawaGrid_1 = __decorate([
+__decorate([
+    property({ type: Number })
+], WawaGrid.prototype, "scrollOffset", void 0);
+__decorate([
+    property({ type: Number })
+], WawaGrid.prototype, "pageSize", void 0);
+__decorate([
+    property()
+], WawaGrid.prototype, "fetchData", void 0);
+WawaGrid = __decorate([
     customElement("wawa-grid")
 ], WawaGrid);
 export { WawaGrid };
