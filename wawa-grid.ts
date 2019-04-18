@@ -128,10 +128,14 @@ export class WawaGrid extends LitElement {
     }
  
     public render(): TemplateResult {
-        return html`${this.renderStyles()}<div @scroll=${this.onScroll}>
-            <table style="border-collapse: collapse;">
-                ${this.renderHeader()}
-                ${repeat(this.items, (i, index) => index, (i, index) => html`${this.renderRow(i, index)}`)}
+        return html`${this.renderStyles()}<div style="width:100%;" @scroll=${this.onScroll}>
+            <table style="border-collapse: collapse;width:100%;">
+                <thead part="head">
+                    ${this.renderHeader()}
+                </thead>
+                <tbody part="body">
+                    ${repeat(this.items, (i, index) => index, (i, index) => html`${this.renderRow(i, index)}`)}
+                </tbody>
             </table>
             <loading-data></loading-data>
         </div>`;
@@ -142,10 +146,10 @@ export class WawaGrid extends LitElement {
 export class LoadingData extends LitElement {
     
     @property({type: Boolean})
-    private fetching: boolean = false;
+    public fetching: boolean = false;
 
     public render(): TemplateResult {
-        return html`${this.fetching ? html`<span style='position:absolute;top:0px;background-color:pink;'>fetching...</span>` : html``}`;
+        return html`${this.fetching ? html`<div style='position:relative;bottom: 0px;width:100%;text-align:center;font-style:italic;color:#757575;'>Loading...</div>` : html``}`;
     }
 }
 
