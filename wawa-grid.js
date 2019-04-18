@@ -12,10 +12,10 @@ let WawaGrid = class WawaGrid extends LitElement {
     constructor() {
         super();
         this.items = [];
-        this.fetching = false;
         this.scrollOffset = 50;
         this.pageSize = 20;
         this.pageNumber = 0;
+        this.fetching = false;
         this.fetchData = undefined;
         this.rowTemplate = "";
         this.headerTemplate = "";
@@ -38,12 +38,14 @@ let WawaGrid = class WawaGrid extends LitElement {
     fetch() {
         if (!this.fetching && this.fetchData) {
             this.fetching = true;
+            this.loadingData.fetching = true;
             this.fetchData(this.pageNumber, this.pageSize).then(items => {
                 for (let i = 0; i < items.length; i++) {
                     this.items.push(items[i]);
                 }
                 this.pageNumber++;
                 this.fetching = false;
+                this.loadingData.fetching = false;
                 this.requestUpdate();
                 if (items.length > 0) {
                     let div = this.renderRoot.querySelector("div");
@@ -59,6 +61,10 @@ let WawaGrid = class WawaGrid extends LitElement {
         if (div.scrollHeight - div.clientHeight - div.scrollTop < this.scrollOffset) {
             this.fetch();
         }
+    }
+    firstUpdated(_changedProperties) {
+        super.firstUpdated(_changedProperties);
+        this.loadingData = this.renderRoot.querySelector("loading-data");
     }
     updated(_changedProperties) {
         super.updated(_changedProperties);
@@ -105,7 +111,7 @@ let WawaGrid = class WawaGrid extends LitElement {
                 ${this.renderHeader()}
                 ${repeat(this.items, (i, index) => index, (i, index) => html `${this.renderRow(i, index)}`)}
             </table>
-            ${this.fetching ? html `<span style='position:absolute;top:0px;background-color:pink;'>fetching...</span>` : html ``}
+            <loading-data></loading-data>
         </div>`;
     }
 };
@@ -125,6 +131,22 @@ WawaGrid = __decorate([
     customElement("wawa-grid")
 ], WawaGrid);
 export { WawaGrid };
+let LoadingData = class LoadingData extends LitElement {
+    constructor() {
+        super(...arguments);
+        this.fetching = false;
+    }
+    render() {
+        return html `${this.fetching ? html `<span style='position:absolute;top:0px;background-color:pink;'>fetching...</span>` : html ``}`;
+    }
+};
+__decorate([
+    property({ type: Boolean })
+], LoadingData.prototype, "fetching", void 0);
+LoadingData = __decorate([
+    customElement("loading-data")
+], LoadingData);
+export { LoadingData };
 let WawaRow = class WawaRow extends LitElement {
     render() {
         return html `<h4 part="yoyo-row">${this.yoyo.name}</h4>`;

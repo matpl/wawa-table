@@ -10,14 +10,15 @@ export class WawaGrid extends LitElement {
     @property({type: Array})
     private items: any[] = [];
 
-    private fetching: boolean = false;
-
     @property({type: Number})
     private scrollOffset: number = 50;
     @property({type: Number})
     private pageSize: number = 20;
 
     private pageNumber: number = 0;
+
+    private fetching: boolean = false;
+    private loadingData?: LoadingData;
 
     @property()
     private fetchData?: (pageNumber: number, pageSize: number) => Promise<any[]> = undefined;
@@ -47,6 +48,7 @@ export class WawaGrid extends LitElement {
     private fetch() {
         if(!this.fetching && this.fetchData) {
             this.fetching = true;
+            this.loadingData!.fetching = true;
 
             this.fetchData(this.pageNumber, this.pageSize).then(items => {
                 for(let i = 0; i < items.length; i++) {
@@ -54,6 +56,7 @@ export class WawaGrid extends LitElement {
                 }
                 this.pageNumber++;
                 this.fetching = false;
+                this.loadingData!.fetching = false;
 
                 this.requestUpdate();
 
@@ -72,6 +75,12 @@ export class WawaGrid extends LitElement {
         if (div.scrollHeight - div.clientHeight - div.scrollTop < this.scrollOffset) {
             this.fetch();
         }
+    }
+
+    protected firstUpdated(_changedProperties: PropertyValues): void {
+        super.firstUpdated(_changedProperties);
+
+        this.loadingData = this.renderRoot.querySelector("loading-data") as LoadingData;
     }
 
     protected updated(_changedProperties: PropertyValues) {
@@ -124,8 +133,19 @@ export class WawaGrid extends LitElement {
                 ${this.renderHeader()}
                 ${repeat(this.items, (i, index) => index, (i, index) => html`${this.renderRow(i, index)}`)}
             </table>
-            ${this.fetching ? html`<span style='position:absolute;top:0px;background-color:pink;'>fetching...</span>` : html``}
+            <loading-data></loading-data>
         </div>`;
+    }
+}
+
+@customElement("loading-data")
+export class LoadingData extends LitElement {
+    
+    @property({type: Boolean})
+    private fetching: boolean = false;
+
+    public render(): TemplateResult {
+        return html`${this.fetching ? html`<span style='position:absolute;top:0px;background-color:pink;'>fetching...</span>` : html``}`;
     }
 }
 
