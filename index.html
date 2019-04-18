@@ -8,7 +8,7 @@
                     await new Promise((resolve, reject) => {
                         setTimeout(() => {
                             resolve();
-                        }, 5000);
+                        }, 2000);
                     });
                     let items = [];
                     for(let i = 0; i < pageSize; i++) {
@@ -19,6 +19,12 @@
                 }
             }, 5000);
         </script>
+        <style>
+            wawa-grid::part(yoyo-row) {
+                background-color:green;
+                width: 1200px;
+            }
+        </style>
     </head>
     <body>
         <wawa-grid id="wawaGrid">
@@ -29,12 +35,18 @@
                 </tr>
             </template>
             <template is="row-template">
+                <style>
+
+                    #wawa {
+                        background-color: pink;
+                    }
+                </style>
                 <tr style="color:white;background-color:${index % 2 === 0 ? 'red' : 'blue'};">
                     <td @click="${item.wawa}">
                         <h1>${item}</h1>
                     </td>
-                    <td>
-                        <h1>${index} <wawa-row .yoyo=${item}></wawa-row></h1>
+                    <td id="wawa" class="crap" part="wawa-cell" style="background-color:yellow;">
+                        <h1>${index} <wawa-row exportparts="yoyo-row" .yoyo=${item}></wawa-row></h1>
                     </td>
                 </tr>
             </template>

@@ -19,6 +19,7 @@ let WawaGrid = class WawaGrid extends LitElement {
         this.rowTemplate = "";
         this.headerTemplate = "";
         this.rows = [];
+        this.localHtml = html;
         for (let i = 0; i < this.children.length; i++) {
             if (this.children[i] instanceof HeaderTemplate) {
                 if (this.headerTemplate != "") {
@@ -87,7 +88,7 @@ let WawaGrid = class WawaGrid extends LitElement {
         stringArray.raw = [this.interpolate(this.rowTemplate, wawa)];
         return html(stringArray as TemplateStringsArray);*/
         if (index >= this.rows.length) {
-            this.rows.push(eval('html`' + this.rowTemplate + '`'));
+            this.rows.push(Function('html', 'item', 'index', '"use strict";return (' + 'html`' + this.rowTemplate + '`' + ')')(html, item, index));
         }
         return this.rows[index];
     }
@@ -128,7 +129,7 @@ WawaGrid = __decorate([
 export { WawaGrid };
 let WawaRow = class WawaRow extends LitElement {
     render() {
-        return html `<h4>${this.yoyo.name}</h4>`;
+        return html `<h4 part="yoyo-row">${this.yoyo.name}</h4>`;
     }
 };
 __decorate([

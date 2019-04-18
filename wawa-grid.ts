@@ -30,6 +30,7 @@ export class WawaGrid extends LitElement {
 
     public constructor() {
         super();
+        this.localHtml = html;
         for(let i = 0; i < this.children.length; i++) {
             if(this.children[i] instanceof HeaderTemplate) {
                 if(this.headerTemplate != "") {
@@ -106,7 +107,7 @@ export class WawaGrid extends LitElement {
         return html(stringArray as TemplateStringsArray);*/
 
         if(index >= this.rows.length) {
-            this.rows.push(eval('html`' + this.rowTemplate + '`'));
+            this.rows.push(Function('html', 'item', 'index', '"use strict";return (' + 'html`' + this.rowTemplate + '`' + ')')(html, item, index));
         }
         return this.rows[index];
     }
@@ -136,6 +137,6 @@ export class WawaRow extends LitElement {
     public yoyo: any;
 
     public render(): TemplateResult {
-        return html`<h4>${this.yoyo.name}</h4>`;
+        return html`<h4 part="yoyo-row">${this.yoyo.name}</h4>`;
     }
 }
