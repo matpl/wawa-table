@@ -4,6 +4,12 @@
         <script>
             setTimeout(() => {
                 document.getElementById("wawaGrid").fetchData = async (pageNumber, pageSize) => {
+                    console.log('FFFF');
+                    await new Promise((resolve, reject) => {
+                        setTimeout(() => {
+                            resolve();
+                        }, 5000);
+                    });
                     let items = [];
                     for(let i = 0; i < pageSize; i++) {
                         items.push({name: "CRAP " + i});
