@@ -18,6 +18,7 @@ let WawaGrid = class WawaGrid extends LitElement {
         this.fetchData = undefined;
         this.rowTemplate = "";
         this.headerTemplate = "";
+        this.rows = [];
         for (let i = 0; i < this.children.length; i++) {
             if (this.children[i] instanceof HeaderTemplate) {
                 if (this.headerTemplate != "") {
@@ -34,7 +35,6 @@ let WawaGrid = class WawaGrid extends LitElement {
         }
     }
     fetch() {
-        console.log('FETCH');
         if (!this.fetching && this.fetchData) {
             this.fetching = true;
             this.fetchData(this.pageNumber, this.pageSize).then(items => {
@@ -81,12 +81,15 @@ let WawaGrid = class WawaGrid extends LitElement {
         const vals = Object.values(item);
         return new Function(...names, `return \`${template}\`;`)(...vals);
     }
-    renderRow(item) {
+    renderRow(item, index) {
         /*let wawa = {item: item};
         const stringArray = [this.interpolate(this.rowTemplate, wawa)] as any;
         stringArray.raw = [this.interpolate(this.rowTemplate, wawa)];
         return html(stringArray as TemplateStringsArray);*/
-        return eval('html`' + this.rowTemplate + '`');
+        if (index >= this.rows.length) {
+            this.rows.push(eval('html`' + this.rowTemplate + '`'));
+        }
+        return this.rows[index];
     }
     renderHeader() {
         const template = this.interpolate(this.headerTemplate, {});
@@ -98,7 +101,7 @@ let WawaGrid = class WawaGrid extends LitElement {
         return html `${this.renderStyles()}<div @scroll=${this.onScroll}>
             <table>
                 ${this.renderHeader()}
-                ${this.items.map(i => html `${this.renderRow(i)}`)}
+                ${this.items.map((elt, i) => html `${this.renderRow(elt, i)}`)}
             </table>
             ${this.fetching ? html `<span style='position:absolute;top:0px;background-color:pink;'>fetching...</span>` : html ``}
         </div>`;
@@ -123,3 +126,15 @@ WawaGrid = __decorate([
     customElement("wawa-grid")
 ], WawaGrid);
 export { WawaGrid };
+let WawaRow = class WawaRow extends LitElement {
+    render() {
+        return html `<h4>${this.yoyo.name}</h4>`;
+    }
+};
+__decorate([
+    property({ type: Object })
+], WawaRow.prototype, "yoyo", void 0);
+WawaRow = __decorate([
+    customElement("wawa-row")
+], WawaRow);
+export { WawaRow };

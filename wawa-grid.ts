@@ -2,6 +2,7 @@
 import { LitElement, customElement, TemplateResult, html, property, PropertyValues } from "lit-element";
 import { RowTemplate } from "./row-template";
 import { HeaderTemplate } from "./header-template";
+import { Template } from "lit-html";
 
 @customElement("wawa-grid")
 export class WawaGrid extends LitElement {
@@ -25,6 +26,8 @@ export class WawaGrid extends LitElement {
     private rowTemplate: string = "";
     private headerTemplate: string = "";
 
+    private rows: TemplateResult[] = []; 
+
     public constructor() {
         super();
         for(let i = 0; i < this.children.length; i++) {
@@ -43,7 +46,6 @@ export class WawaGrid extends LitElement {
     }
 
     private fetch() {
-        console.log('FETCH');
         if(!this.fetching && this.fetchData) {
             this.fetching = true;
 
@@ -97,12 +99,16 @@ export class WawaGrid extends LitElement {
         return new Function(...names, `return \`${template}\`;`)(...vals);
     }
 
-    private renderRow(item: any): TemplateResult {
+    private renderRow(item: any, index: number): TemplateResult {
         /*let wawa = {item: item};
         const stringArray = [this.interpolate(this.rowTemplate, wawa)] as any;
         stringArray.raw = [this.interpolate(this.rowTemplate, wawa)];
         return html(stringArray as TemplateStringsArray);*/
-        return eval('html`' + this.rowTemplate + '`');
+
+        if(index >= this.rows.length) {
+            this.rows.push(eval('html`' + this.rowTemplate + '`'));
+        }
+        return this.rows[index];
     }
 
     public renderHeader(): TemplateResult {
@@ -116,9 +122,20 @@ export class WawaGrid extends LitElement {
         return html`${this.renderStyles()}<div @scroll=${this.onScroll}>
             <table>
                 ${this.renderHeader()}
-                ${this.items.map(i => html`${this.renderRow(i)}`)}
+                ${this.items.map((elt, i) => html`${this.renderRow(elt, i)}`)}
             </table>
             ${this.fetching ? html`<span style='position:absolute;top:0px;background-color:pink;'>fetching...</span>` : html``}
         </div>`;
+    }
+}
+
+@customElement("wawa-row")
+export class WawaRow extends LitElement {
+
+    @property({type: Object})
+    public yoyo: any;
+
+    public render(): TemplateResult {
+        return html`<h4>${this.yoyo.name}</h4>`;
     }
 }

@@ -23,12 +23,12 @@
                 </tr>
             </template>
             <template is="row-template">
-                <tr style="background-color:${item.total % 2 === 0 ? 'red' : 'blue'};">
+                <tr style="color:white;background-color:${index % 2 === 0 ? 'red' : 'blue'};">
                     <td @click="${item.wawa}">
-                        <h1>${item + "qasaasdasd"}</h1>
+                        <h1>${item}</h1>
                     </td>
                     <td>
-                        <h1>${item.total}</h1>
+                        <h1>${index} <wawa-row .yoyo=${item}></wawa-row></h1>
                     </td>
                 </tr>
             </template>
