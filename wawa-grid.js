@@ -5,6 +5,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 import { LitElement, customElement, html, property } from "lit-element";
+import { repeat } from 'lit-html/directives/repeat';
 import { RowTemplate } from "./row-template";
 import { HeaderTemplate } from "./header-template";
 let WawaGrid = class WawaGrid extends LitElement {
@@ -13,13 +14,12 @@ let WawaGrid = class WawaGrid extends LitElement {
         this.items = [];
         this.fetching = false;
         this.scrollOffset = 50;
-        this.pageSize = 3;
+        this.pageSize = 20;
         this.pageNumber = 0;
         this.fetchData = undefined;
         this.rowTemplate = "";
         this.headerTemplate = "";
         this.rows = [];
-        this.localHtml = html;
         for (let i = 0; i < this.children.length; i++) {
             if (this.children[i] instanceof HeaderTemplate) {
                 if (this.headerTemplate != "") {
@@ -44,6 +44,7 @@ let WawaGrid = class WawaGrid extends LitElement {
                 }
                 this.pageNumber++;
                 this.fetching = false;
+                this.requestUpdate();
                 if (items.length > 0) {
                     let div = this.renderRoot.querySelector("div");
                     if (div.scrollHeight <= div.clientHeight) {
@@ -100,9 +101,9 @@ let WawaGrid = class WawaGrid extends LitElement {
     }
     render() {
         return html `${this.renderStyles()}<div @scroll=${this.onScroll}>
-            <table>
+            <table style="border-collapse: collapse;">
                 ${this.renderHeader()}
-                ${this.items.map((elt, i) => html `${this.renderRow(elt, i)}`)}
+                ${repeat(this.items, (i, index) => index, (i, index) => html `${this.renderRow(i, index)}`)}
             </table>
             ${this.fetching ? html `<span style='position:absolute;top:0px;background-color:pink;'>fetching...</span>` : html ``}
         </div>`;
@@ -111,9 +112,6 @@ let WawaGrid = class WawaGrid extends LitElement {
 __decorate([
     property({ type: Array })
 ], WawaGrid.prototype, "items", void 0);
-__decorate([
-    property({ type: Boolean })
-], WawaGrid.prototype, "fetching", void 0);
 __decorate([
     property({ type: Number })
 ], WawaGrid.prototype, "scrollOffset", void 0);

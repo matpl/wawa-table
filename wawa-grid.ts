@@ -1,8 +1,8 @@
 
 import { LitElement, customElement, TemplateResult, html, property, PropertyValues } from "lit-element";
+import {repeat} from 'lit-html/directives/repeat';
 import { RowTemplate } from "./row-template";
 import { HeaderTemplate } from "./header-template";
-import { Template } from "lit-html";
 
 @customElement("wawa-grid")
 export class WawaGrid extends LitElement {
@@ -10,13 +10,12 @@ export class WawaGrid extends LitElement {
     @property({type: Array})
     private items: any[] = [];
 
-    @property({type: Boolean})
     private fetching: boolean = false;
 
     @property({type: Number})
     private scrollOffset: number = 50;
     @property({type: Number})
-    private pageSize: number = 3;
+    private pageSize: number = 20;
 
     private pageNumber: number = 0;
 
@@ -30,7 +29,6 @@ export class WawaGrid extends LitElement {
 
     public constructor() {
         super();
-        this.localHtml = html;
         for(let i = 0; i < this.children.length; i++) {
             if(this.children[i] instanceof HeaderTemplate) {
                 if(this.headerTemplate != "") {
@@ -56,6 +54,8 @@ export class WawaGrid extends LitElement {
                 }
                 this.pageNumber++;
                 this.fetching = false;
+
+                this.requestUpdate();
 
                 if(items.length > 0) {
                     let div: HTMLDivElement = this.renderRoot.querySelector("div") as HTMLDivElement;
@@ -105,7 +105,6 @@ export class WawaGrid extends LitElement {
         const stringArray = [this.interpolate(this.rowTemplate, wawa)] as any;
         stringArray.raw = [this.interpolate(this.rowTemplate, wawa)];
         return html(stringArray as TemplateStringsArray);*/
-
         if(index >= this.rows.length) {
             this.rows.push(Function('html', 'item', 'index', '"use strict";return (' + 'html`' + this.rowTemplate + '`' + ')')(html, item, index));
         }
@@ -121,9 +120,9 @@ export class WawaGrid extends LitElement {
  
     public render(): TemplateResult {
         return html`${this.renderStyles()}<div @scroll=${this.onScroll}>
-            <table>
+            <table style="border-collapse: collapse;">
                 ${this.renderHeader()}
-                ${this.items.map((elt, i) => html`${this.renderRow(elt, i)}`)}
+                ${repeat(this.items, (i, index) => index, (i, index) => html`${this.renderRow(i, index)}`)}
             </table>
             ${this.fetching ? html`<span style='position:absolute;top:0px;background-color:pink;'>fetching...</span>` : html``}
         </div>`;
