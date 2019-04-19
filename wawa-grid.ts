@@ -3,6 +3,7 @@ import { LitElement, customElement, TemplateResult, html, property, PropertyValu
 import {repeat} from 'lit-html/directives/repeat';
 import { RowTemplate } from "./row-template";
 import { HeaderTemplate } from "./header-template";
+import { LoadingTemplate } from "./loading-template";
 
 @customElement("wawa-grid")
 export class WawaGrid extends LitElement {
@@ -24,7 +25,8 @@ export class WawaGrid extends LitElement {
     private fetchData?: (pageNumber: number, pageSize: number) => Promise<any[]> = undefined;
 
     private rowTemplate: string = "";
-    private headerTemplate: string = "";
+    private headerTemplate?: DocumentFragment;
+    private loadingTemplate?: DocumentFragment;
 
     private rows: TemplateResult[] = []; 
 
@@ -32,10 +34,15 @@ export class WawaGrid extends LitElement {
         super();
         for(let i = 0; i < this.children.length; i++) {
             if(this.children[i] instanceof HeaderTemplate) {
-                if(this.headerTemplate != "") {
+                if(this.headerTemplate) {
                     console.error("Only one header-template required");
                 }
-                this.headerTemplate = this.children[i].innerHTML.replace("`", "\\`");
+                this.headerTemplate = document.importNode((this.children[i] as HeaderTemplate).content, true);
+            } else if(this.children[i] instanceof LoadingTemplate) {
+                if(this.loadingTemplate) {
+                    console.error("Only one loading-template required");
+                }
+                this.loadingTemplate = document.importNode((this.children[i] as LoadingTemplate).content, true);
             } else if(this.children[i] instanceof RowTemplate) {
                 if(this.rowTemplate != "") {
                     console.error("Only one row-template required");
@@ -103,41 +110,24 @@ export class WawaGrid extends LitElement {
         `;
     }
 
-    private interpolate(template: string, item: any) {
-        const names = Object.keys(item);
-        const vals = Object.values(item);
-        return new Function(...names, `return \`${template}\`;`)(...vals);
-    }
-
     private renderRow(item: any, index: number): TemplateResult {
-        /*let wawa = {item: item};
-        const stringArray = [this.interpolate(this.rowTemplate, wawa)] as any;
-        stringArray.raw = [this.interpolate(this.rowTemplate, wawa)];
-        return html(stringArray as TemplateStringsArray);*/
         if(index >= this.rows.length) {
             this.rows.push(Function('html', 'item', 'index', '"use strict";return (' + 'html`' + this.rowTemplate + '`' + ')')(html, item, index));
         }
         return this.rows[index];
-    }
-
-    public renderHeader(): TemplateResult {
-        const template = this.interpolate(this.headerTemplate, {});
-        const stringArray = [template] as any;
-        stringArray.raw = [template];
-        return html(stringArray as TemplateStringsArray);
     }
  
     public render(): TemplateResult {
         return html`${this.renderStyles()}<div style="width:100%;" @scroll=${this.onScroll}>
             <table style="border-collapse: collapse;width:100%;">
                 <thead part="head">
-                    ${this.renderHeader()}
+                    ${this.headerTemplate}
                 </thead>
                 <tbody part="body">
                     ${repeat(this.items, (i, index) => index, (i, index) => html`${this.renderRow(i, index)}`)}
                 </tbody>
             </table>
-            <loading-data></loading-data>
+            <loading-data .loadingTemplate=${this.loadingTemplate}></loading-data>
         </div>`;
     }
 }
@@ -148,18 +138,17 @@ export class LoadingData extends LitElement {
     @property({type: Boolean})
     public fetching: boolean = false;
 
-    public render(): TemplateResult {
-        return html`${this.fetching ? html`<div style='position:relative;bottom: 0px;width:100%;text-align:center;font-style:italic;color:#757575;'>Loading...</div>` : html``}`;
-    }
-}
-
-@customElement("wawa-row")
-export class WawaRow extends LitElement {
-
-    @property({type: Object})
-    public yoyo: any;
+    @property()
+    private loadingTemplate?: DocumentFragment;
 
     public render(): TemplateResult {
-        return html`<h4 part="yoyo-row">${this.yoyo.name}</h4>`;
+        if(this.fetching) {
+            if(this.loadingTemplate) {
+                return html`${this.loadingTemplate}`;
+            } else {
+                return html`<div style='position:relative;bottom: 0px;width:100%;text-align:center;font-style:italic;color:#757575;'>Loading...</div>`;
+            }
+        }
+        return html``;
     }
 }
