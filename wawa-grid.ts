@@ -12,9 +12,9 @@ export class WawaGrid extends LitElement {
     private items: any[] = [];
 
     @property({type: Number})
-    private scrollOffset: number = 50;
+    public scrollOffset: number = 50;
     @property({type: Number})
-    private pageSize: number = 20;
+    public pageSize: number = 20;
 
     private pageNumber: number = 0;
 
@@ -25,8 +25,8 @@ export class WawaGrid extends LitElement {
     private fetchData?: (pageNumber: number, pageSize: number) => Promise<any[]> = undefined;
 
     private rowTemplate: string = "";
-    private headerTemplate?: DocumentFragment;
-    private loadingTemplate?: DocumentFragment;
+    private headerTemplate?: Element[];
+    private loadingTemplate?: Element[];
 
     private rows: TemplateResult[] = []; 
 
@@ -37,12 +37,12 @@ export class WawaGrid extends LitElement {
                 if(this.headerTemplate) {
                     console.error("Only one header-template required");
                 }
-                this.headerTemplate = document.importNode((this.children[i] as HeaderTemplate).content, true);
+                this.headerTemplate = Array.from(document.importNode((this.children[i] as HeaderTemplate).content, true).children);
             } else if(this.children[i] instanceof LoadingTemplate) {
                 if(this.loadingTemplate) {
                     console.error("Only one loading-template required");
                 }
-                this.loadingTemplate = document.importNode((this.children[i] as LoadingTemplate).content, true);
+                this.loadingTemplate = Array.from(document.importNode((this.children[i] as LoadingTemplate).content, true).children);
             } else if(this.children[i] instanceof RowTemplate) {
                 if(this.rowTemplate != "") {
                     console.error("Only one row-template required");
@@ -139,14 +139,12 @@ export class LoadingData extends LitElement {
     public fetching: boolean = false;
 
     @property()
-    private loadingTemplate?: DocumentFragment;
+    private loadingTemplate?: Element[];
 
     public render(): TemplateResult {
         if(this.fetching) {
             if(this.loadingTemplate) {
                 return html`${this.loadingTemplate}`;
-            } else {
-                return html`<div style='position:relative;bottom: 0px;width:100%;text-align:center;font-style:italic;color:#757575;'>Loading...</div>`;
             }
         }
         return html``;

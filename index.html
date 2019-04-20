@@ -4,11 +4,10 @@
         <script>
             setTimeout(() => {
                 document.getElementById("wawaGrid").fetchData = async (pageNumber, pageSize) => {
-                    console.log('FFFF');
                     await new Promise((resolve, reject) => {
                         setTimeout(() => {
                             resolve();
-                        }, 2000);
+                        }, 200);
                     });
                     let items = [];
                     for(let i = 0; i < pageSize; i++) {
@@ -17,7 +16,7 @@
 
                     return items;
                 }
-            }, 5000);
+            }, 2000);
         </script>
         <style>
             wawa-grid::part(yoyo-row) {
@@ -49,6 +48,9 @@
                         <h1>${index} <wawa-row exportparts="yoyo-row" .yoyo=${item}></wawa-row></h1>
                     </td>
                 </tr>
+            </template>
+            <template is="loading-template">
+                <div style='position:relative;bottom: 0px;width:100%;text-align:center;font-style:italic;color:#757575;'>WAWA...</div>
             </template>
         </wawa-grid>
     </body>
