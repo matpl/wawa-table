@@ -9,7 +9,7 @@ import { LoadingTemplate } from "./loading-template";
 export class WawaGrid extends LitElement {
 
     @property({type: Array})
-    private items: any[] = [];
+    public items: any[] = [];
 
     @property({type: Number})
     public scrollOffset: number = 50;
@@ -119,7 +119,7 @@ export class WawaGrid extends LitElement {
  
     public render(): TemplateResult {
         return html`${this.renderStyles()}<div style="width:100%;" @scroll=${this.onScroll}>
-            <table style="border-collapse: collapse;width:100%;">
+            <table part="table" style="border-collapse: collapse;width:100%;">
                 <thead part="head">
                     ${this.headerTemplate}
                 </thead>
