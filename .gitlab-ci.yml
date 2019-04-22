@@ -1,0 +1,8 @@
+stages:
+  - build
+
+build ts:
+  stage: build
+  script:
+    - npm i
+    - tsc
