@@ -2,7 +2,8 @@ stages:
   - build
 
 build ts:
+  image: node:10
   stage: build
   script:
     - npm i
-    - tsc
+    - npm run build
