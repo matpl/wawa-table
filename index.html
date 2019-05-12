@@ -1,6 +1,7 @@
 <html>
     <head>
         <script type="module" src="./wawa-grid.js"></script>
+        <script type="module" src="./observer-element.js"></script>
         <script>
             setTimeout(() => {
                 document.getElementById("wawaGrid").fetchData = async (pageNumber, pageSize) => {
@@ -12,6 +13,11 @@
                     let items = [];
                     for(let i = 0; i < pageSize; i++) {
                         items.push({name: "CRAP " + i});
+                        if(i == 5) {
+                            setTimeout(() => {
+                                items[5].name = "NOOOOOO";
+                            }, 6000);
+                        }
                     }
 
                     return items;
@@ -26,7 +32,7 @@
         </style>
     </head>
     <body>
-        <wawa-grid id="wawaGrid">
+        <wawa-grid id="wawaGrid" monitor="true">
             <template is="header-template">
                 <tr>
                     <th>Name</th>
@@ -42,7 +48,7 @@
                 </style>
                 <tr style="color:white;background-color:${index % 2 === 0 ? 'red' : 'blue'};">
                     <td @click="${item.wawa}">
-                        <h1>${item}</h1>
+                        <h1>${item}</h1><h2>${item.name}</h2>
                     </td>
                     <td id="wawa" class="crap" part="wawa-cell" style="background-color:yellow;">
                         <h1>${index} <wawa-row exportparts="yoyo-row" .yoyo=${item}></wawa-row></h1>

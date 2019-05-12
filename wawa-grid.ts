@@ -22,13 +22,16 @@ export class WawaGrid extends LitElement {
     private loadingData?: LoadingData;
 
     @property()
-    private fetchData?: (pageNumber: number, pageSize: number) => Promise<any[]> = undefined;
+    public fetchData?: (pageNumber: number, pageSize: number) => Promise<any[]> = undefined;
+
+    @property({type: Boolean})
+    public monitor: boolean = false;
 
     private rowTemplate: string = "";
     private headerTemplate?: Element[];
     private loadingTemplate?: Element[];
 
-    private rows: TemplateResult[] = []; 
+    private rows: [TemplateResult, boolean][] = []; 
 
     public constructor() {
         super();
@@ -58,7 +61,39 @@ export class WawaGrid extends LitElement {
             this.loadingData!.fetching = true;
 
             this.fetchData(this.pageNumber, this.pageSize).then(items => {
+                var grid = this;
                 for(let i = 0; i < items.length; i++) {
+
+                    let pos = this.items.length;
+                    if(this.monitor) {
+                        let item = items[i];
+                        item.updatewawa = false;
+                        for(let property in item) {
+                            if(property !== "updatewawa") {
+                                let orig = item[property];
+                                console.log('define ' + property);
+                                Object.defineProperty(item, property, {
+                                    get: function() {
+                                        return this[property + "wawa"];
+                                    },
+                                    set: function(val) {
+                                        this[property + "wawa"] = val;
+
+                                        if(this.updatewawa) {
+                                            console.log('UPDATE YO');
+                                            if(grid.rows.length > pos) {
+                                                grid.rows[pos][1] = true;
+                                                grid.requestUpdate();
+                                            }
+                                        }
+                                    }
+                                });
+                                item[property] = orig;
+                            }
+                        }
+                        item.updatewawa = true;
+                    }
+
                     this.items.push(items[i]);
                 }
                 this.pageNumber++;
@@ -90,13 +125,19 @@ export class WawaGrid extends LitElement {
         this.loadingData = this.renderRoot.querySelector("loading-data") as LoadingData;
     }
 
-    protected updated(_changedProperties: PropertyValues) {
-        super.updated(_changedProperties);
+    protected update(_changedProperties: PropertyValues) {
         if(_changedProperties.has("fetchData")) {
             this.items = [];
             this.pageNumber = 0;
             this.fetch();
         }
+        if(_changedProperties.has("monitor")) {
+            if(this.monitor) {
+                // monitor existing items
+            }
+        }
+
+        super.update(_changedProperties);
     }
 
     private renderStyles(): TemplateResult {
@@ -112,12 +153,16 @@ export class WawaGrid extends LitElement {
 
     private renderRow(item: any, index: number): TemplateResult {
         if(index >= this.rows.length) {
-            this.rows.push(Function('html', 'item', 'index', '"use strict";return (' + 'html`' + this.rowTemplate + '`' + ')')(html, item, index));
+            this.rows.push([Function('html', 'item', 'index', '"use strict";return (' + 'html`' + this.rowTemplate + '`' + ')')(html, item, index), false]);
+        } else if(this.rows[index][1]) {
+            // re-render
+            this.rows[index] = [Function('html', 'item', 'index', '"use strict";return (' + 'html`' + this.rowTemplate + '`' + ')')(html, item, index), false];
         }
-        return this.rows[index];
+        return this.rows[index][0];
     }
  
     public render(): TemplateResult {
+        console.log('RENDER ' + this.monitor);
         return html`${this.renderStyles()}<div style="width:100%;" @scroll=${this.onScroll}>
             <table part="table" style="border-collapse: collapse;width:100%;">
                 <thead part="head">
