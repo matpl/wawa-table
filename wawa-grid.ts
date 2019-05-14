@@ -4,12 +4,33 @@ import {repeat} from 'lit-html/directives/repeat';
 import { RowTemplate } from "./row-template";
 import { HeaderTemplate } from "./header-template";
 import { LoadingTemplate } from "./loading-template";
+import { WawaRow } from "./wawa-row";
+import { WawaItem } from "./wawa-item";
 
 @customElement("wawa-grid")
 export class WawaGrid extends LitElement {
 
+    // decouple items and rows...
+
+    // list item wrappers
+    // list row wrappers
+
+    // itemWrapper: 
+    //      item: data
+    //      x   index: int
+    //      modifiedCallback: true/false (if visible when put to true: requestUpdate)
+    //      x   rowWrapper: (if item is currently visible)
+
+    // rowWrapper:
+    //      row templateresult
+    //      item
+
+    // item: data
+    // shouldRender: true/false
+    // rows: templateResult
+
     @property({type: Array})
-    public items: any[] = [];
+    public items: WawaItem[] = [];
 
     @property({type: Number})
     public scrollOffset: number = 50;
@@ -31,7 +52,7 @@ export class WawaGrid extends LitElement {
     private headerTemplate?: Element[];
     private loadingTemplate?: Element[];
 
-    private rows: [TemplateResult, boolean][] = []; 
+    private rows: WawaRow[] = []; 
 
     public constructor() {
         super();
@@ -61,40 +82,8 @@ export class WawaGrid extends LitElement {
             this.loadingData!.fetching = true;
 
             this.fetchData(this.pageNumber, this.pageSize).then(items => {
-                var grid = this;
                 for(let i = 0; i < items.length; i++) {
-
-                    let pos = this.items.length;
-                    if(this.monitor) {
-                        let item = items[i];
-                        item.updatewawa = false;
-                        for(let property in item) {
-                            if(property !== "updatewawa") {
-                                let orig = item[property];
-                                console.log('define ' + property);
-                                Object.defineProperty(item, property, {
-                                    get: function() {
-                                        return this[property + "wawa"];
-                                    },
-                                    set: function(val) {
-                                        this[property + "wawa"] = val;
-
-                                        if(this.updatewawa) {
-                                            console.log('UPDATE YO');
-                                            if(grid.rows.length > pos) {
-                                                grid.rows[pos][1] = true;
-                                                grid.requestUpdate();
-                                            }
-                                        }
-                                    }
-                                });
-                                item[property] = orig;
-                            }
-                        }
-                        item.updatewawa = true;
-                    }
-
-                    this.items.push(items[i]);
+                    this.items.push(new WawaItem(items[i], this.items.length, this.monitor));
                 }
                 this.pageNumber++;
                 this.fetching = false;
@@ -151,14 +140,11 @@ export class WawaGrid extends LitElement {
         `;
     }
 
-    private renderRow(item: any, index: number): TemplateResult {
-        if(index >= this.rows.length) {
-            this.rows.push([Function('html', 'item', 'index', '"use strict";return (' + 'html`' + this.rowTemplate + '`' + ')')(html, item, index), false]);
-        } else if(this.rows[index][1]) {
-            // re-render
-            this.rows[index] = [Function('html', 'item', 'index', '"use strict";return (' + 'html`' + this.rowTemplate + '`' + ')')(html, item, index), false];
+    private renderRow(item: WawaItem): TemplateResult {
+        if(item.index >= this.rows.length) {
+            this.rows.push(new WawaRow(this.rowTemplate, item, () => this.requestUpdate()));
         }
-        return this.rows[index][0];
+        return this.rows[item.index].template;
     }
  
     public render(): TemplateResult {
@@ -169,7 +155,7 @@ export class WawaGrid extends LitElement {
                     ${this.headerTemplate}
                 </thead>
                 <tbody part="body">
-                    ${repeat(this.items, (i, index) => index, (i, index) => html`${this.renderRow(i, index)}`)}
+                    ${repeat(this.items, (i, index) => index, (i, index) => html`${this.renderRow(i)}`)}
                 </tbody>
             </table>
             <loading-data .loadingTemplate=${this.loadingTemplate}></loading-data>

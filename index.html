@@ -12,7 +12,7 @@
                     });
                     let items = [];
                     for(let i = 0; i < pageSize; i++) {
-                        items.push({name: "CRAP " + i});
+                        items.push({name: "CRAP " + (pageNumber * pageSize + i)});
                         if(i == 5) {
                             setTimeout(() => {
                                 items[5].name = "NOOOOOO";
@@ -32,7 +32,7 @@
         </style>
     </head>
     <body>
-        <wawa-grid id="wawaGrid" monitor="true">
+        <wawa-grid id="wawaGrid" monitor="true" pageSize="2000">
             <template is="header-template">
                 <tr>
                     <th>Name</th>
