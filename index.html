@@ -1,11 +1,11 @@
 <html>
     <head>
-        <script type="module" src="./wawa-grid.js"></script>
-        <script type="module" src="./observer-element.js"></script>
+        <script type="module" src="./wawa-table.js"></script>
         <script>
             setTimeout(() => {
-                document.getElementById("wawaGrid").fetchData = async (pageNumber, pageSize) => {
+                document.querySelector("wawa-table").fetchData = async (pageNumber, pageSize) => {
                     await new Promise((resolve, reject) => {
+                        // simulate network call
                         setTimeout(() => {
                             resolve();
                         }, 200);
@@ -25,14 +25,14 @@
             }, 2000);
         </script>
         <style>
-            wawa-grid::part(yoyo-row) {
+            wawa-table::part(yoyo-row) {
                 background-color:green;
                 width: 1200px;
             }
         </style>
     </head>
     <body>
-        <wawa-grid id="wawaGrid" monitor="true" pageSize="2000">
+        <wawa-table monitor="true">
             <template is="header-template">
                 <tr>
                     <th>Name</th>
@@ -58,6 +58,6 @@
             <template is="loading-template">
                 <div style='position:relative;bottom: 0px;width:100%;text-align:center;font-style:italic;color:#757575;'>WAWA...</div>
             </template>
-        </wawa-grid>
+        </wawa-table>
     </body>
 </html>

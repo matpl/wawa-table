@@ -7,27 +7,8 @@ import { LoadingTemplate } from "./loading-template";
 import { WawaRow } from "./wawa-row";
 import { WawaItem } from "./wawa-item";
 
-@customElement("wawa-grid")
-export class WawaGrid extends LitElement {
-
-    // decouple items and rows...
-
-    // list item wrappers
-    // list row wrappers
-
-    // itemWrapper: 
-    //      item: data
-    //      x   index: int
-    //      modifiedCallback: true/false (if visible when put to true: requestUpdate)
-    //      x   rowWrapper: (if item is currently visible)
-
-    // rowWrapper:
-    //      row templateresult
-    //      item
-
-    // item: data
-    // shouldRender: true/false
-    // rows: templateResult
+@customElement("wawa-table")
+export class WawaTable extends LitElement {
 
     @property({type: Array})
     public items: WawaItem[] = [];
@@ -148,7 +129,6 @@ export class WawaGrid extends LitElement {
     }
  
     public render(): TemplateResult {
-        console.log('RENDER ' + this.monitor);
         return html`${this.renderStyles()}<div style="width:100%;" @scroll=${this.onScroll}>
             <table part="table" style="border-collapse: collapse;width:100%;">
                 <thead part="head">

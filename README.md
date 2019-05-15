@@ -1,2 +1,2 @@
-# wawa-grid
+# wawa-table
 minimalist infinite grid web component
