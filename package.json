@@ -1,5 +1,5 @@
 {
-  "name": "wawa-table",
+  "name": "@wawa/table",
   "version": "0.1.0",
   "description": "",
   "main": "index.js",
@@ -15,5 +15,8 @@
   },
   "devDependencies": {
     "typescript": "^3.4.3"
-  }
+  },
+  "files": [
+    "**.js"
+  ]
 }
