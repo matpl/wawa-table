@@ -1,14 +1,17 @@
 import { WawaItem } from "./wawa-item";
 import { TemplateResult, html } from "lit-html";
+import { WawaTable } from "./wawa-table";
 
 export class WawaRow {
     private _item!: WawaItem;
     private _rowTemplate: string;
     private _template!: TemplateResult;
     public modifiedCallback?: () => void;
+    public table: WawaTable;
 
-    public constructor(rowTemplate: string, item: WawaItem, modifiedCallback: () => void) {
+    public constructor(rowTemplate: string, item: WawaItem, table: WawaTable, modifiedCallback: () => void) {
         this._rowTemplate = rowTemplate;
+        this.table = table;
         this.item = item;
         this.modifiedCallback = modifiedCallback;
     }
@@ -42,6 +45,6 @@ export class WawaRow {
     }
 
     private _updateTemplate(): void {
-        this._template = Function('html', 'item', 'index', '"use strict";return (' + 'html`' + this._rowTemplate + '`' + ')')(html, this._item.item, this._item.index);
+        this._template = Function('html', 'item', 'index', 'table', '"use strict";return (' + 'html`' + this._rowTemplate + '`' + ')')(html, this._item.item, this._item.index, this.table);
     }
 }

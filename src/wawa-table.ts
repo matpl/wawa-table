@@ -123,7 +123,7 @@ export class WawaTable extends LitElement {
 
     private renderRow(item: WawaItem): TemplateResult {
         if(item.index >= this.rows.length) {
-            this.rows.push(new WawaRow(this.rowTemplate, item, () => this.requestUpdate()));
+            this.rows.push(new WawaRow(this.rowTemplate, item, this, () => this.requestUpdate()));
         }
         return this.rows[item.index].template;
     }
