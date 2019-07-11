@@ -67,6 +67,15 @@ export class WawaTable extends LitElement {
         }
     }
 
+    private resetObserver(): void {
+        this.childObserver.disconnect();
+        if (this.observeChildren) {
+            this.childObserver.observe(this, { childList: true });
+            this.loadTemplates();
+            this.requestUpdate();
+        }
+    }
+
     private fetch(): void {
         if(!this.fetching && this.fetchData) {
             this.fetching = true;
@@ -101,10 +110,7 @@ export class WawaTable extends LitElement {
 
     protected firstUpdated(_changedProperties: PropertyValues): void {
         super.firstUpdated(_changedProperties);
-        this.childObserver.disconnect();
-        if (this.observeChildren) {
-            this.childObserver.observe(this, { childList: true });
-        }
+        this.resetObserver();
         this.loadingData = this.renderRoot.querySelector("loading-data") as LoadingData;
     }
 
@@ -119,11 +125,8 @@ export class WawaTable extends LitElement {
                 // monitor existing items
             }
         }
-        if (_changedProperties.has("childObserver")) {
-            this.childObserver.disconnect();
-            if (this.childObserver) {
-                this.childObserver.observe(this, { childList: true });
-            }
+        if (_changedProperties.has("observeChildren")) {
+            this.resetObserver();
         }
         super.update(_changedProperties);
     }
