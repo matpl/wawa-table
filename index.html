@@ -32,7 +32,7 @@
         </style>
     </head>
     <body>
-        <wawa-table monitor="true">
+        <wawa-table monitor="true" observeChildren>
             <template is="header-template">
                 <tr>
                     <th>Name</th>
@@ -41,7 +41,6 @@
             </template>
             <template is="row-template">
                 <style>
-
                     #wawa {
                         background-color: pink;
                     }
