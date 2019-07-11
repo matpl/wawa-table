@@ -1,6 +1,6 @@
 
 import { LitElement, customElement, TemplateResult, html, property, PropertyValues } from "lit-element";
-import {repeat} from 'lit-html/directives/repeat';
+import { repeat } from "lit-html/directives/repeat";
 import { RowTemplate } from "./row-template";
 import { HeaderTemplate } from "./header-template";
 import { LoadingTemplate } from "./loading-template";
@@ -25,19 +25,29 @@ export class WawaTable extends LitElement {
 
     @property()
     public fetchData?: (pageNumber: number, pageSize: number) => Promise<any[]> = undefined;
-
     @property({type: Boolean})
     public monitor: boolean = false;
+    /** Enables changing the header and/or row templates dynamically */
+    @property({type: Boolean})
+    public observeChildren: boolean = false;
 
+    private childObserver: MutationObserver = new MutationObserver(() => { this.loadTemplates(); this.requestUpdate(); });
     private rowTemplate: string = "";
     private headerTemplate?: Element[];
     private loadingTemplate?: Element[];
 
-    private rows: WawaRow[] = []; 
+    private rows: WawaRow[] = [];
 
     public constructor() {
         super();
-        for(let i = 0; i < this.children.length; i++) {
+        this.loadTemplates();
+    }
+
+    private loadTemplates(): void {
+        this.headerTemplate = undefined;
+        this.loadingTemplate = undefined;
+        this.rowTemplate = "";
+        for(let i: number = 0; i < this.children.length; i++) {
             if(this.children[i] instanceof HeaderTemplate) {
                 if(this.headerTemplate) {
                     console.error("Only one header-template required");
@@ -49,7 +59,7 @@ export class WawaTable extends LitElement {
                 }
                 this.loadingTemplate = Array.from(document.importNode((this.children[i] as LoadingTemplate).content, true).children);
             } else if(this.children[i] instanceof RowTemplate) {
-                if(this.rowTemplate != "") {
+                if(this.rowTemplate !== "") {
                     console.error("Only one row-template required");
                 }
                 this.rowTemplate = this.children[i].innerHTML.replace("`", "\\`");
@@ -57,13 +67,13 @@ export class WawaTable extends LitElement {
         }
     }
 
-    private fetch() {
+    private fetch(): void {
         if(!this.fetching && this.fetchData) {
             this.fetching = true;
             this.loadingData!.fetching = true;
 
             this.fetchData(this.pageNumber, this.pageSize).then(items => {
-                for(let i = 0; i < items.length; i++) {
+                for(let i: number = 0; i < items.length; i++) {
                     this.items.push(new WawaItem(items[i], this.items.length, this.monitor));
                 }
                 this.pageNumber++;
@@ -91,11 +101,14 @@ export class WawaTable extends LitElement {
 
     protected firstUpdated(_changedProperties: PropertyValues): void {
         super.firstUpdated(_changedProperties);
-
+        this.childObserver.disconnect();
+        if (this.observeChildren) {
+            this.childObserver.observe(this, { childList: true });
+        }
         this.loadingData = this.renderRoot.querySelector("loading-data") as LoadingData;
     }
 
-    protected update(_changedProperties: PropertyValues) {
+    protected update(_changedProperties: PropertyValues): void {
         if(_changedProperties.has("fetchData")) {
             this.items = [];
             this.pageNumber = 0;
@@ -106,7 +119,12 @@ export class WawaTable extends LitElement {
                 // monitor existing items
             }
         }
-
+        if (_changedProperties.has("childObserver")) {
+            this.childObserver.disconnect();
+            if (this.childObserver) {
+                this.childObserver.observe(this, { childList: true });
+            }
+        }
         super.update(_changedProperties);
     }
 
@@ -127,7 +145,7 @@ export class WawaTable extends LitElement {
         }
         return this.rows[item.index].template;
     }
- 
+
     public render(): TemplateResult {
         return html`${this.renderStyles()}<div style="width:100%;" @scroll=${this.onScroll}>
             <table part="table" style="border-collapse: collapse;width:100%;">
@@ -145,7 +163,7 @@ export class WawaTable extends LitElement {
 
 @customElement("loading-data")
 export class LoadingData extends LitElement {
-    
+
     @property({type: Boolean})
     public fetching: boolean = false;
 
