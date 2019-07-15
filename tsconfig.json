@@ -5,7 +5,8 @@
     "moduleResolution": "node",
     "lib": ["es2017", "dom"],
     "experimentalDecorators": true,
-    "outDir": "."
+    "outDir": ".",
+    "declaration": true
   },
   "include": [
     "./src/**/*"
