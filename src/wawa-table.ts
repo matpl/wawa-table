@@ -101,7 +101,7 @@ export class WawaTable extends LitElement {
         }
     }
 
-    public onScroll(e: Event): void {
+    private onScroll(e: Event): void {
         let div: HTMLDivElement = e.composedPath()[0] as HTMLDivElement;
         if (div.scrollHeight - div.clientHeight - div.scrollTop < this.scrollOffset) {
             this.fetch();
@@ -149,7 +149,7 @@ export class WawaTable extends LitElement {
         return this.rows[item.index].template;
     }
 
-    public render(): TemplateResult {
+    protected render(): TemplateResult {
         return html`${this.renderStyles()}<div style="width:100%;" @scroll=${this.onScroll}>
             <table part="table" style="border-collapse: collapse;width:100%;">
                 <thead part="head">
@@ -161,6 +161,33 @@ export class WawaTable extends LitElement {
             </table>
             <loading-data .loadingTemplate=${this.loadingTemplate}></loading-data>
         </div>`;
+    }
+
+    /**
+     * Insert an item into the table at a specific index.
+     * @param item The item to insert into the table
+     * @param index The index to insert the item at
+     */
+    public insertItem(item: any, index: number): void {
+        const newItem: WawaItem = new WawaItem(item, index, this.monitor);
+        this.items.filter(i => i.index >= index).forEach(i => i.index += 1);
+        this.items.splice(index, 0, newItem);
+        this.rows = [];
+        this.requestUpdate();
+    }
+
+    /**
+     * Remove an item from the table. Does nothing if the item is not present.
+     * @param item The item to remove
+     */
+    public removeItem(item: any): void {
+        const index: number = this.items.findIndex(i => i.item === item);
+        if (index === -1) {
+            return;
+        }
+        this.items.splice(index, 1);
+        this.rows = [];
+        this.requestUpdate();
     }
 }
 
