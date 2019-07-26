@@ -93,7 +93,7 @@ export class WawaTable extends LitElement {
 
                 if(items.length > 0) {
                     let div: HTMLDivElement = this.renderRoot.querySelector("div") as HTMLDivElement;
-                    if(div.scrollHeight <= div.clientHeight) {
+                    if(div && div.clientHeight !== 0 && div.scrollHeight <= div.clientHeight) {
                         this.fetch();
                     }
                 }
