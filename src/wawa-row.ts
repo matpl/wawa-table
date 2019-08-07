@@ -27,12 +27,12 @@ export class WawaRow {
         this._item = val;
         if(this._item) {
             this._updateTemplate();
-            this._item.modifiedCallback = () => {
+            /*this._item.modifiedCallback = () => {
                 this._updateTemplate();
                 if(this.modifiedCallback) {
                     this.modifiedCallback();
                 }
-            };
+            };*/
         }
     }
 
@@ -45,6 +45,6 @@ export class WawaRow {
     }
 
     private _updateTemplate(): void {
-        this._template = Function('html', 'item', 'index', 'table', '"use strict";return (' + 'html`' + this._rowTemplate + '`' + ')')(html, this._item.item, this._item.index, this.table);
+        this._template = Function('html', 'item', 'index', 'table', 'wawaitem', '"use strict";return (' + 'html`' + this._rowTemplate + '`' + ')')(html, this._item.item, this._item.index, this.table, this._item);
     }
 }

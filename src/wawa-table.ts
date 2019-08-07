@@ -6,6 +6,7 @@ import { HeaderTemplate } from "./header-template";
 import { LoadingTemplate } from "./loading-template";
 import { WawaRow } from "./wawa-row";
 import { WawaItem } from "./wawa-item";
+import "./wawa-tr";
 
 @customElement("wawa-table")
 export class WawaTable extends LitElement {
@@ -62,7 +63,7 @@ export class WawaTable extends LitElement {
                 if(this.rowTemplate !== "") {
                     console.error("Only one row-template required");
                 }
-                this.rowTemplate = this.children[i].innerHTML.replace("`", "\\`");
+                this.rowTemplate = this.children[i].innerHTML.replace(/`/g, "\\`").replace(/<tr/,"<tr is='wawa-tr' .item=${wawaitem}");
             }
         }
     }
