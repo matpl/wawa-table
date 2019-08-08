@@ -9,11 +9,10 @@ export class WawaRow {
     public modifiedCallback?: () => void;
     public table: WawaTable;
 
-    public constructor(rowTemplate: string, item: WawaItem, table: WawaTable, modifiedCallback: () => void) {
+    public constructor(rowTemplate: string, item: WawaItem, table: WawaTable) {
         this._rowTemplate = rowTemplate;
         this.table = table;
         this.item = item;
-        this.modifiedCallback = modifiedCallback;
     }
 
     public get item(): WawaItem {
@@ -27,12 +26,13 @@ export class WawaRow {
         this._item = val;
         if(this._item) {
             this._updateTemplate();
-            /*this._item.modifiedCallback = () => {
-                this._updateTemplate();
-                if(this.modifiedCallback) {
-                    this.modifiedCallback();
-                }
-            };*/
+            this._item.modifiedCallback = () => {
+                //this._updateTemplate();
+                //if(this.modifiedCallback) {
+                //    this.modifiedCallback();
+                //}
+                this._item.modified = true;
+            };
         }
     }
 

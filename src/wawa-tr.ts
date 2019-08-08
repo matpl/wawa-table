@@ -1,20 +1,23 @@
 import { html, render, TemplateResult } from "lit-html";
+import { WawaItem } from "./wawa-item";
 
 export class WawaTr extends HTMLTableRowElement {
 
-    private _item;
+    private _item: WawaItem;
     private _template: (name) => TemplateResult;
 
-    get item() {
+    get item(): WawaItem {
         return this._item;
     }
 
-    set item(val) {
+    set item(val: WawaItem) {
         this._item = val;
         this._item.modifiedCallback = () => {
-            console.log('BRO WAWA');
-            var name = Math.random() + " wawa";
-            render(this._template(name), this);
+            render(Function('html', 'item', 'index', 'table', 'wawaitem', '"use strict";return (' + 'html`' + this._item.innerRowTemplate + '`' + ')')(html, this._item.item, this._item.index, 'wawa', this._item), this);
+        }
+        if(this._item.modified) { // i don't think this condition is necessary
+            this._item.modified = false;
+            this._item.modifiedCallback();
         }
     }
 

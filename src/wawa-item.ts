@@ -3,12 +3,16 @@ export class WawaItem {
     public modifiedCallback?: () => void;
     private _monitor: boolean = false;
     private _item!: any;
+    public innerRowTemplate: string;
     public index: number;
 
-    public constructor(item: any, index: number, monitor: boolean) {
+    public modified: boolean;
+
+    public constructor(item: any, index: number, monitor: boolean, innerRowTemplate: string) {
         this._monitor = monitor;
         this.item = item;
         this.index = index;
+        this.innerRowTemplate = innerRowTemplate;
     }
 
     public get item(): any {
