@@ -4,31 +4,35 @@ import { WawaItem } from "./wawa-item";
 export class WawaTr extends HTMLTableRowElement {
 
     private _item: WawaItem;
-    private _template: (name) => TemplateResult;
 
-    get item(): WawaItem {
+    public get item(): WawaItem {
         return this._item;
     }
 
-    set item(val: WawaItem) {
+    public set item(val: WawaItem) {
         this._item = val;
-        this._item.modifiedCallback = () => {
-            render(Function('html', 'item', 'index', 'table', 'wawaitem', '"use strict";return (' + 'html`' + this._item.innerRowTemplate + '`' + ')')(html, this._item.item, this._item.index, 'wawa', this._item), this);
+        var wawaTr = this;
+        if(val.table.monitor) {
+            this._item.item.updatewawa = false;
+            for(let property in this._item.item) {
+                if(property !== "updatewawa") {
+                    let orig = this._item.item[property];
+                    Object.defineProperty(this._item.item, property, {
+                        get: function() {
+                            return this[property + "wawa"];
+                        },
+                        set: function(val) {
+                            this[property + "wawa"] = val;
+                            if(this.updatewawa) {
+                                render(Function('html', 'item', 'index', 'table', 'wawaitem', '"use strict";return (' + 'html`' + wawaTr.item.table.innerRowTemplate + '`' + ')')(html, wawaTr.item.item, wawaTr.item.index, wawaTr.item.table, wawaTr.item), wawaTr);
+                            }
+                        }
+                    });
+                    this._item.item[property] = orig;
+                }
+            }
+            this._item.item.updatewawa = true;
         }
-        if(this._item.modified) { // i don't think this condition is necessary
-            this._item.modified = false;
-            this._item.modifiedCallback();
-        }
-    }
-
-    constructor() {
-        super();
-        
-        this._template = (name) => html`<p>sup ${name}</p>`;
-    }
-
-    attributeChangedCallback(attrName, oldVal, newVal) {
-        console.log("attribute changed");
     }
 }
 
