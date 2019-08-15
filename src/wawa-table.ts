@@ -29,9 +29,9 @@ export class WawaTable extends LitElement {
     private loadingData?: LoadingData;
 
     @property({type: Number})
-    private startIndex: number = 0;
+    protected startIndex: number = 0;
     @property({type: Number})
-    private visibleRows: number = 0;
+    protected visibleRows: number = 0;
 
     @property()
     public fetchData?: (pageNumber: number, pageSize: number) => Promise<any[]> = undefined;
