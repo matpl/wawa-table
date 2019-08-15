@@ -17,11 +17,16 @@ export class WawaTable extends LitElement {
     public scrollOffset: number = 50;
     @property({type: Number})
     public pageSize: number = 20;
+    @property({type: Number})
+    public virtualizeRowHeight: number = 0;
 
     private pageNumber: number = 0;
 
     private fetching: boolean = false;
     private loadingData?: LoadingData;
+
+    private startIndex: number = 0;
+    private visibleRows: number = 0;
 
     @property()
     public fetchData?: (pageNumber: number, pageSize: number) => Promise<any[]> = undefined;
@@ -155,7 +160,15 @@ export class WawaTable extends LitElement {
                     ${this.headerTemplate}
                 </thead>
                 <tbody part="body">
-                    ${repeat(this.items, (i, index) => index, (i, index) => html`${i.template}`)}
+                    ${this.startIndex > 0 ? html`<tr style="height:${this.startIndex * this.virtualizeRowHeight}"></tr>` : html``}
+                    ${repeat(this.items, (i, index) => index, (i, index) => {
+                        if (index >= this.startIndex && (this.visibleRows == 0 || index < this.startIndex + this.visibleRows)) {
+                            return html`${i.template}`;
+                        } else {
+                            return  html``;
+                        }
+                    })}
+                    ${this.visibleRows > 0 && this.items.length - this.visibleRows - this.startIndex > 0 ? html`<tr style="height:${(this.items.length - this.visibleRows - this.startIndex) * this.virtualizeRowHeight}"></tr>` : html``}
                 </tbody>
             </table>
             <loading-data .loadingTemplate=${this.loadingTemplate}></loading-data>
