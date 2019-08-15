@@ -1,5 +1,5 @@
 
-import { LitElement, customElement, TemplateResult, html, property, PropertyValues } from "lit-element";
+import { LitElement, customElement, TemplateResult, html, property, PropertyValues, query } from "lit-element";
 import { repeat } from "lit-html/directives/repeat";
 import { RowTemplate } from "./row-template";
 import { HeaderTemplate } from "./header-template";
@@ -21,6 +21,7 @@ export class WawaTable extends LitElement {
     private pageNumber: number = 0;
 
     private fetching: boolean = false;
+    @query("loading-data")
     private loadingData?: LoadingData;
 
     @property()
@@ -85,7 +86,9 @@ export class WawaTable extends LitElement {
     private fetch(): void {
         if(!this.fetching && this.fetchData) {
             this.fetching = true;
-            this.loadingData!.fetching = true;
+            if (this.loadingData) {
+                this.loadingData.fetching = true;
+            }
 
             this.fetchData(this.pageNumber, this.pageSize).then(items => {
                 for(let i: number = 0; i < items.length; i++) {
@@ -93,7 +96,9 @@ export class WawaTable extends LitElement {
                 }
                 this.pageNumber++;
                 this.fetching = false;
-                this.loadingData!.fetching = false;
+                if (this.loadingData) {
+                    this.loadingData.fetching = false;
+                }
 
                 this.requestUpdate();
 
@@ -117,7 +122,6 @@ export class WawaTable extends LitElement {
     protected firstUpdated(_changedProperties: PropertyValues): void {
         super.firstUpdated(_changedProperties);
         this.resetObserver();
-        this.loadingData = this.renderRoot.querySelector("loading-data") as LoadingData;
     }
 
     protected update(_changedProperties: PropertyValues): void {
