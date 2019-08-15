@@ -17,15 +17,19 @@ export class WawaTable extends LitElement {
     public scrollOffset: number = 50;
     @property({type: Number})
     public pageSize: number = 20;
+
+    // setting the rowHeight enables virtualization
     @property({type: Number})
-    public virtualizeRowHeight: number = 0;
+    public rowHeight: number = 0;
 
     private pageNumber: number = 0;
 
     private fetching: boolean = false;
     private loadingData?: LoadingData;
 
+    @property({type: Number})
     private startIndex: number = 0;
+    @property({type: Number})
     private visibleRows: number = 0;
 
     @property()
@@ -100,6 +104,8 @@ export class WawaTable extends LitElement {
                 this.fetching = false;
                 this.loadingData!.fetching = false;
 
+                this.computeVisibleRows();
+
                 this.requestUpdate();
 
                 if(items.length > 0) {
@@ -112,8 +118,29 @@ export class WawaTable extends LitElement {
         }
     }
 
+    private lastScroll:number = 0;
+    private computeVisibleRows(): void {
+        let div: HTMLDivElement = this.renderRoot.querySelector("div") as HTMLDivElement;
+        let thead: HTMLElement = this.renderRoot.querySelector("thead") as HTMLElement;
+        if(this.rowHeight > 0) {
+            let visibleRows = Math.ceil(div.clientHeight / this.rowHeight) * 2;
+            let startIndex = Math.max(Math.floor((div.scrollTop - thead.clientHeight) / this.rowHeight - this.visibleRows / 4), 0);
+            let lastScroll = (div.scrollTop - thead.clientHeight) / this.rowHeight;
+            if(visibleRows != this.visibleRows || Math.abs(this.lastScroll - lastScroll) > visibleRows / 4) {
+                // if the number of visible rows changed, it's enough to request a render
+                // if we scrolled one half table height, it's enough to request a render
+                this.visibleRows = visibleRows;
+                this.startIndex = startIndex;
+                this.lastScroll = lastScroll;
+            }
+        }
+    }
+
     private onScroll(e: Event): void {
         let div: HTMLDivElement = e.composedPath()[0] as HTMLDivElement;
+
+        this.computeVisibleRows();
+
         if (div.scrollHeight - div.clientHeight - div.scrollTop < this.scrollOffset) {
             this.fetch();
         }
@@ -160,7 +187,7 @@ export class WawaTable extends LitElement {
                     ${this.headerTemplate}
                 </thead>
                 <tbody part="body">
-                    ${this.startIndex > 0 ? html`<tr style="height:${this.startIndex * this.virtualizeRowHeight}"></tr>` : html``}
+                    ${this.startIndex > 0 ? html`<tr style="height:${this.startIndex * this.rowHeight}px"></tr>` : html``}
                     ${repeat(this.items, (i, index) => index, (i, index) => {
                         if (index >= this.startIndex && (this.visibleRows == 0 || index < this.startIndex + this.visibleRows)) {
                             return html`${i.template}`;
@@ -168,7 +195,7 @@ export class WawaTable extends LitElement {
                             return  html``;
                         }
                     })}
-                    ${this.visibleRows > 0 && this.items.length - this.visibleRows - this.startIndex > 0 ? html`<tr style="height:${(this.items.length - this.visibleRows - this.startIndex) * this.virtualizeRowHeight}"></tr>` : html``}
+                    ${this.visibleRows > 0 && this.items.length - this.visibleRows - this.startIndex > 0 ? html`<tr style="height:${(this.items.length - this.visibleRows - this.startIndex) * this.rowHeight}px"></tr>` : html``}
                 </tbody>
             </table>
             <loading-data .loadingTemplate=${this.loadingTemplate}></loading-data>
