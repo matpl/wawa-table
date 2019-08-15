@@ -4,8 +4,8 @@ import { repeat } from "lit-html/directives/repeat";
 import { RowTemplate } from "./row-template";
 import { HeaderTemplate } from "./header-template";
 import { LoadingTemplate } from "./loading-template";
-import { WawaRow } from "./wawa-row";
 import { WawaItem } from "./wawa-item";
+import "./wawa-tr";
 
 @customElement("wawa-table")
 export class WawaTable extends LitElement {
@@ -32,11 +32,10 @@ export class WawaTable extends LitElement {
     public observeChildren: boolean = false;
 
     private childObserver: MutationObserver = new MutationObserver(() => { this.loadTemplates(); this.requestUpdate(); });
-    private rowTemplate: string = "";
+    public rowTemplate: string = "";
+    public innerRowTemplate: string = "";
     private headerTemplate?: Element[];
     private loadingTemplate?: Element[];
-
-    private rows: WawaRow[] = [];
 
     public constructor() {
         super();
@@ -47,6 +46,7 @@ export class WawaTable extends LitElement {
         this.headerTemplate = undefined;
         this.loadingTemplate = undefined;
         this.rowTemplate = "";
+        this.innerRowTemplate = "";
         for(let i: number = 0; i < this.children.length; i++) {
             if(this.children[i] instanceof HeaderTemplate) {
                 if(this.headerTemplate) {
@@ -62,7 +62,13 @@ export class WawaTable extends LitElement {
                 if(this.rowTemplate !== "") {
                     console.error("Only one row-template required");
                 }
-                this.rowTemplate = this.children[i].innerHTML.replace("`", "\\`");
+                this.rowTemplate = this.children[i].innerHTML.replace(/`/g, "\\`").replace(/<tr/,"<tr is='wawa-tr' .item=${wawaitem}");
+                for(let j = 0; j < (this.children[i] as HTMLTemplateElement).content.children.length; j++) {
+                    if((this.children[i] as HTMLTemplateElement).content.children[j] instanceof HTMLTableRowElement) {
+                        this.innerRowTemplate = (this.children[i] as HTMLTemplateElement).content.children[j].innerHTML.replace(/`/g, "\\`");
+                        break;
+                    }
+                }
             }
         }
     }
@@ -83,7 +89,7 @@ export class WawaTable extends LitElement {
 
             this.fetchData(this.pageNumber, this.pageSize).then(items => {
                 for(let i: number = 0; i < items.length; i++) {
-                    this.items.push(new WawaItem(items[i], this.items.length, this.monitor));
+                    this.items.push(new WawaItem(items[i], this));
                 }
                 this.pageNumber++;
                 this.fetching = false;
@@ -142,13 +148,6 @@ export class WawaTable extends LitElement {
         `;
     }
 
-    private renderRow(item: WawaItem): TemplateResult {
-        if(item.index >= this.rows.length) {
-            this.rows.push(new WawaRow(this.rowTemplate, item, this, () => this.requestUpdate()));
-        }
-        return this.rows[item.index].template;
-    }
-
     protected render(): TemplateResult {
         return html`${this.renderStyles()}<div style="width:100%;" @scroll=${this.onScroll}>
             <table part="table" style="border-collapse: collapse;width:100%;">
@@ -156,7 +155,7 @@ export class WawaTable extends LitElement {
                     ${this.headerTemplate}
                 </thead>
                 <tbody part="body">
-                    ${repeat(this.items, (i, index) => index, (i, index) => html`${this.renderRow(i)}`)}
+                    ${repeat(this.items, (i, index) => index, (i, index) => html`${i.template}`)}
                 </tbody>
             </table>
             <loading-data .loadingTemplate=${this.loadingTemplate}></loading-data>
@@ -169,10 +168,9 @@ export class WawaTable extends LitElement {
      * @param index The index to insert the item at
      */
     public insertItem(item: any, index: number): void {
-        const newItem: WawaItem = new WawaItem(item, index, this.monitor);
+        const newItem: WawaItem = new WawaItem(item, this);
         this.items.filter(i => i.index >= index).forEach(i => i.index += 1);
         this.items.splice(index, 0, newItem);
-        this.rows = [];
         this.requestUpdate();
     }
 
@@ -186,7 +184,6 @@ export class WawaTable extends LitElement {
             return;
         }
         this.items.splice(index, 1);
-        this.rows = [];
         this.requestUpdate();
     }
 }
