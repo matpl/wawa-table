@@ -15,13 +15,13 @@ export class WawaItem {
 
     public get template(): TemplateResult {
         if(!this._template) {
-            this._updateTemplate();
+            this.updateTemplate();
         }
 
         return this._template;
     }
 
-    private _updateTemplate(): void {
+    public updateTemplate(): void {
         this._template = Function('html', 'item', 'index', 'table', 'wawaitem', '"use strict";return (' + 'html`' + this.table.rowTemplate + '`' + ')')(html, this.item, this.index, this.table, this);
     }
 }

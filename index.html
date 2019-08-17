@@ -12,7 +12,7 @@
                     });
                     let items = [];
                     for(let i = 0; i < pageSize; i++) {
-                        items.push({name: "CRAP " + (pageNumber * pageSize + i)});
+                        items.push({name: "name " + (pageNumber * pageSize + i)});
                         if(i == 5) {
                             setTimeout(() => {
                                 items[5].name = "NOOOOOO";
@@ -24,33 +24,29 @@
                 }
             }, 2000);
         </script>
+        <link href="https://fonts.googleapis.com/css?family=Varela&display=swap" rel="stylesheet">
         <style>
-            wawa-table::part(yoyo-row) {
-                background-color:green;
-                width: 1200px;
+            wawa-table {
+                font-size: 18px;
+                font-family: Varela;
             }
         </style>
     </head>
     <body>
-        <wawa-table monitor="true">
+        <wawa-table monitor="true" rowHeight="50">
             <template is="header-template">
-                <tr>
-                    <th>Name</th>
-                    <th>Crap</th>
+                <tr style="font-weight:bold;background-color:#6c7ae0;color:white;height:60px;text-align:left;">
+                    <th style="padding-left:40px;">Name</th>
+                    <th style="padding-left:40px;">Info</th>
                 </tr>
             </template>
             <template is="row-template">
-                <style>
-                    #wawa {
-                        background-color: pink;
-                    }
-                </style>
-                <tr style="color:white;background-color:${index % 2 === 0 ? 'red' : 'blue'};">
-                    <td @click="${item.wawa}">
-                        <h1>${item}</h1><h2>${item.name}</h2>
+                <tr style="height:50px;color:gray;background-color:${index % 2 === 0 ? 'white' : '#f8f6ff'};">
+                    <td @click="${item.wawa}" style="padding-left:40px;">
+                        ${item.name}
                     </td>
-                    <td id="wawa" class="crap" part="wawa-cell" style="background-color:yellow;">
-                        <h1>${index} <wawa-row exportparts="yoyo-row" .yoyo=${item}></wawa-row></h1>
+                    <td style="padding-left:40px;">
+                        ${index}
                     </td>
                 </tr>
             </template>

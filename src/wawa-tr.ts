@@ -15,7 +15,7 @@ export class WawaTr extends HTMLTableRowElement {
         if(val.table.monitor) {
             this._item.item.updatewawa = false;
             for(let property in this._item.item) {
-                if(property !== "updatewawa") {
+                if(property !== "updatewawa" && !property.endsWith("wawa")) {
                     let orig = this._item.item[property];
                     Object.defineProperty(this._item.item, property, {
                         get: function() {
@@ -24,6 +24,7 @@ export class WawaTr extends HTMLTableRowElement {
                         set: function(val) {
                             this[property + "wawa"] = val;
                             if(this.updatewawa) {
+                                wawaTr.item.updateTemplate();
                                 render(Function('html', 'item', 'index', 'table', 'wawaitem', '"use strict";return (' + 'html`' + wawaTr.item.table.innerRowTemplate + '`' + ')')(html, wawaTr.item.item, wawaTr.item.index, wawaTr.item.table, wawaTr.item), wawaTr);
                             }
                         }
