@@ -215,7 +215,8 @@ export class WawaTable extends LitElement {
         const newItem: WawaItem = new WawaItem(item, this);
         this.items.filter(i => i.index >= index).forEach(i => i.index += 1);
         this.items.splice(index, 0, newItem);
-        this.requestUpdate();
+        this.requestUpdate(); // add the new item to the table
+        this.items.forEach(i => i.updateTemplate()); // update the existing items
     }
 
     /**
@@ -229,6 +230,7 @@ export class WawaTable extends LitElement {
         }
         this.items.splice(index, 1);
         this.requestUpdate();
+        this.items.forEach(i => i.updateTemplate());
     }
 }
 
