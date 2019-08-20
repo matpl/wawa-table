@@ -192,7 +192,7 @@ export class WawaTable extends LitElement {
                 </thead>
                 <tbody part="body">
                     ${this.startIndex > 0 ? html`<tr style="height:${this.startIndex * this.rowHeight}px"></tr>` : html``}
-                    ${repeat(this.items, (i, index) => index, (i, index) => {
+                    ${repeat(this.items, (i) => i.id, (i, index) => {
                         if (index >= this.startIndex && (this.visibleRows == 0 || index < this.startIndex + this.visibleRows)) {
                             return html`${i.template}`;
                         } else {
@@ -213,7 +213,11 @@ export class WawaTable extends LitElement {
      */
     public insertItem(item: any, index: number): void {
         const newItem: WawaItem = new WawaItem(item, this);
-        this.items.filter(i => i.index >= index).forEach(i => i.index += 1);
+        newItem.index = index;
+        this.items.filter(i => i.index >= index).forEach(i => {
+            i.index += 1;
+            i.updateTemplate();
+        });
         this.items.splice(index, 0, newItem);
         this.requestUpdate();
     }
@@ -228,6 +232,10 @@ export class WawaTable extends LitElement {
             return;
         }
         this.items.splice(index, 1);
+        this.items.filter(i => i.index > index).forEach(i => {
+            i.index -= 1;
+            i.updateTemplate();
+        });
         this.requestUpdate();
     }
 }

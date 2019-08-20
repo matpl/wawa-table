@@ -25,7 +25,6 @@ export class WawaTr extends HTMLTableRowElement {
                             this[property + "wawa"] = val;
                             if(this.updatewawa) {
                                 wawaTr.item.updateTemplate();
-                                render(Function('html', 'item', 'index', 'table', 'wawaitem', '"use strict";return (' + 'html`' + wawaTr.item.table.innerRowTemplate + '`' + ')')(html, wawaTr.item.item, wawaTr.item.index, wawaTr.item.table, wawaTr.item), wawaTr);
                             }
                         }
                     });
@@ -34,6 +33,18 @@ export class WawaTr extends HTMLTableRowElement {
             }
             this._item.item.updatewawa = true;
         }
+    }
+
+    connectedCallback() {
+        this._item.templateUpdatedCallback = this.render.bind(this);
+    }
+
+    disconnectedCallback() {
+        this._item.templateUpdatedCallback = undefined;
+    }
+
+    private render(): void {
+        render(Function('html', 'item', 'index', 'table', 'wawaitem', '"use strict";return (' + 'html`' + this.item.table.innerRowTemplate + '`' + ')')(html, this.item.item, this.item.index, this.item.table, this.item), this);
     }
 }
 
