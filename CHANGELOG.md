@@ -1,5 +1,11 @@
 # wawa-table
 
+## 0.1.10
+
+### Fixed
+
+- No longer fetches more items once an empty array is returned
+
 ## 0.1.9
 
 ### Fixed
