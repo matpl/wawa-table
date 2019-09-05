@@ -1,5 +1,13 @@
 # wawa-table
 
+## 0.1.10
+
+### Fixed
+
+- Update loading after first update
+- Do not fetch more items before an update for rendering items is complete
+- No longer fetches more items once an empty array is returned
+
 ## 0.1.9
 
 ### Fixed
