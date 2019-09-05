@@ -154,6 +154,9 @@ export class WawaTable extends LitElement {
     protected firstUpdated(_changedProperties: PropertyValues): void {
         super.firstUpdated(_changedProperties);
         this.resetObserver();
+        if (this.loadingData) {
+            this.loadingData.fetching = this.fetching;
+        }
     }
 
     protected update(_changedProperties: PropertyValues): void {
