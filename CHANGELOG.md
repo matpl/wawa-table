@@ -4,6 +4,7 @@
 
 ### Fixed
 
+- Do not fetch more items before an update for rendering items is complete
 - No longer fetches more items once an empty array is returned
 
 ## 0.1.9

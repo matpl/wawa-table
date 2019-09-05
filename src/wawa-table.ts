@@ -99,20 +99,19 @@ export class WawaTable extends LitElement {
                 this.loadingData.fetching = true;
             }
 
-            this.fetchData(this.pageNumber, this.pageSize).then(items => {
+            this.fetchData(this.pageNumber, this.pageSize).then(async items => {
                 this.moreItems = items.length > 0;
                 for(let i: number = 0; i < items.length; i++) {
                     this.items.push(new WawaItem(items[i], this));
                 }
                 this.pageNumber++;
+                this.computeVisibleRows();
+
+                await this.requestUpdate();
                 this.fetching = false;
                 if (this.loadingData) {
                     this.loadingData.fetching = false;
                 }
-
-                this.computeVisibleRows();
-
-                this.requestUpdate();
 
                 if(items.length > 0) {
                     let div: HTMLDivElement = this.renderRoot.querySelector("div") as HTMLDivElement;
