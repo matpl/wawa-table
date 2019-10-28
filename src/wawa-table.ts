@@ -141,6 +141,16 @@ export class WawaTable extends LitElement {
         }
     }
 
+    public connectedCallback(): void {
+        super.connectedCallback();
+
+        // if the number of items exceeds the page size, it won't fetch nor compute the visible rows again
+        if(this.items.length >= this.pageSize) 
+        {
+            this.computeVisibleRows();
+        }
+    }
+
     private onScroll(e: Event): void {
         let div: HTMLDivElement = e.composedPath()[0] as HTMLDivElement;
 
