@@ -141,6 +141,14 @@ export class WawaTable extends LitElement {
         }
     }
 
+    public connectedCallback(): void {
+        super.connectedCallback();
+
+        if(this.items.length >= this.pageSize) {
+            this.computeVisibleRows();
+        }
+    }
+
     private onScroll(e: Event): void {
         let div: HTMLDivElement = e.composedPath()[0] as HTMLDivElement;
 
