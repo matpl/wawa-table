@@ -144,8 +144,7 @@ export class WawaTable extends LitElement {
     public connectedCallback(): void {
         super.connectedCallback();
 
-        if(this.items.length >= this.pageSize) 
-        {
+        if(this.items.length >= this.pageSize) {
             this.computeVisibleRows();
         }
     }
