@@ -1,5 +1,11 @@
 # wawa-table
 
+## 0.1.14
+
+### Fixed
+
+- Load the templates in the firstUpdated function if they are not loaded yet. Can happen if used within another LitElement
+
 ## 0.1.10
 
 ### Fixed

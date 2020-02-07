@@ -23,8 +23,8 @@ export class WawaTable extends LitElement {
     public rowHeight: number = 0;
 
     private pageNumber: number = 0;
-    private moreItems: boolean = true;
-    private fetching: boolean = false;
+    protected moreItems: boolean = true;
+    protected fetching: boolean = false;
     @query("loading-data")
     private loadingData?: LoadingData;
 
@@ -92,7 +92,7 @@ export class WawaTable extends LitElement {
         }
     }
 
-    private fetch(): void {
+    protected fetch(): void {
         if(!this.fetching && this.fetchData && this.moreItems) {
             this.fetching = true;
             if (this.loadingData) {
@@ -161,6 +161,10 @@ export class WawaTable extends LitElement {
 
     protected firstUpdated(_changedProperties: PropertyValues): void {
         super.firstUpdated(_changedProperties);
+		// if templates aren't loaded yet, do it now
+		if(!this.headerTemplate && !this.rowTemplate && !this.loadingTemplate) {
+            this.loadTemplates();
+        }
         this.resetObserver();
         if (this.loadingData) {
             this.loadingData.fetching = this.fetching;
