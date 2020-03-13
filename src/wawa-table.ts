@@ -175,6 +175,7 @@ export class WawaTable extends LitElement {
         if(_changedProperties.has("fetchData")) {
             this.items = [];
             this.pageNumber = 0;
+            this.moreItems = true;
             this.fetch();
         }
         if(_changedProperties.has("monitor")) {

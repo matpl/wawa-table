@@ -1,5 +1,11 @@
 # wawa-table
 
+## 0.1.15
+
+### Fixed
+
+- Reset moreItems when fetchData function is changed
+
 ## 0.1.14
 
 ### Fixed
