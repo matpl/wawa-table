@@ -1,5 +1,11 @@
 # wawa-table
 
+## 0.1.16
+
+### Fixed
+
+- Add bind support in the header template
+
 ## 0.1.15
 
 ### Fixed

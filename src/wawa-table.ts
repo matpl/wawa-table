@@ -44,7 +44,7 @@ export class WawaTable extends LitElement {
     private childObserver: MutationObserver = new MutationObserver(() => { this.loadTemplates(); this.requestUpdate(); });
     public rowTemplate: string = "";
     public innerRowTemplate: string = "";
-    private headerTemplate?: Element[];
+    private headerTemplate?: TemplateResult;
     private loadingTemplate?: Element[];
 
     public constructor() {
@@ -62,7 +62,8 @@ export class WawaTable extends LitElement {
                 if(this.headerTemplate) {
                     console.error("Only one header-template required");
                 }
-                this.headerTemplate = Array.from(document.importNode((this.children[i] as HeaderTemplate).content, true).children);
+                var headerTemplateStr = this.children[i].innerHTML.replace(/`/g, "\\`");
+                this.headerTemplate = Function('html', 'table', '"use strict";return (' + 'html`' + headerTemplateStr + '`' + ')')(html, this);
             } else if(this.children[i] instanceof LoadingTemplate) {
                 if(this.loadingTemplate) {
                     console.error("Only one loading-template required");
