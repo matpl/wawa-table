@@ -1,7 +1,10 @@
 import { html, render, TemplateResult } from "lit-html";
 import { WawaItem } from "./wawa-item";
+import { WawaTable } from "./wawa-table";
 
 export class WawaTr extends HTMLTableRowElement {
+
+    public renderInnerRowCallback: (item: any, index: number, table: WawaTable, wawaitem: WawaItem) => TemplateResult;
 
     private _item: WawaItem;
 
@@ -37,6 +40,9 @@ export class WawaTr extends HTMLTableRowElement {
 
     connectedCallback() {
         this._item.templateUpdatedCallback = this.render.bind(this);
+        if(!this.item.table.innerRowTemplate && this.renderInnerRowCallback) {
+            this.render();
+        }
     }
 
     disconnectedCallback() {
@@ -44,7 +50,11 @@ export class WawaTr extends HTMLTableRowElement {
     }
 
     private render(): void {
-        render(Function('html', 'item', 'index', 'table', 'wawaitem', '"use strict";return (' + 'html`' + this.item.table.innerRowTemplate + '`' + ')')(html, this.item.item, this.item.index, this.item.table, this.item), this);
+        if(this.item.table.innerRowTemplate) {
+            render(Function('html', 'item', 'index', 'table', 'wawaitem', '"use strict";return (' + 'html`' + this.item.table.innerRowTemplate + '`' + ')')(html, this.item.item, this.item.index, this.item.table, this.item), this);
+        } else if(this.renderInnerRowCallback) {
+            render(this.renderInnerRowCallback(this.item.item, this.item.index, this.item.table, this.item), this);
+        }
     }
 }
 

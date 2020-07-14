@@ -29,7 +29,11 @@ export class WawaItem {
     }
 
     public updateTemplate(): void {
-        this._template = Function('html', 'item', 'index', 'table', 'wawaitem', '"use strict";return (' + 'html`' + this.table.rowTemplate + '`' + ')')(html, this.item, this.index, this.table, this);
+        if(this.table.rowTemplate) {
+            this._template = Function('html', 'item', 'index', 'table', 'wawaitem', '"use strict";return (' + 'html`' + this.table.rowTemplate + '`' + ')')(html, this.item, this.index, this.table, this);
+        } else if(this.table.renderRowCallback) {
+            this._template = this.table.renderRowCallback(this.item, this.index, this.table, this);
+        }
         if(this.templateUpdatedCallback) {
             this.templateUpdatedCallback();
         }

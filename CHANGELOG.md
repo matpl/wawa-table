@@ -1,5 +1,11 @@
 # wawa-table
 
+## 0.1.17
+
+### Added
+
+- Added callbacks for providing row / inner row templates
+
 ## 0.1.16
 
 ### Fixed

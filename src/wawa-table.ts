@@ -6,6 +6,7 @@ import { HeaderTemplate } from "./header-template";
 import { LoadingTemplate } from "./loading-template";
 import { WawaItem } from "./wawa-item";
 import "./wawa-tr";
+import { Template } from "lit-html";
 
 @customElement("wawa-table")
 export class WawaTable extends LitElement {
@@ -47,6 +48,11 @@ export class WawaTable extends LitElement {
     private headerTemplate?: TemplateResult;
     private loadingTemplate?: Element[];
 
+    @property({type: Object})
+    public renderHeaderCallback: (table: WawaTable) => TemplateResult;
+    @property({type: Object})
+    public renderRowCallback: (item: any, index: number, table: WawaTable, wawaitem: WawaItem) => TemplateResult;
+
     public constructor() {
         super();
         this.loadTemplates();
@@ -81,6 +87,10 @@ export class WawaTable extends LitElement {
                     }
                 }
             }
+        }
+
+        if(!this.headerTemplate && this.renderHeaderCallback) {
+            this.headerTemplate = this.renderHeaderCallback(this);
         }
     }
 
