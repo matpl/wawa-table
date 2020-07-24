@@ -6,6 +6,7 @@ import { HeaderTemplate } from "./header-template";
 import { LoadingTemplate } from "./loading-template";
 import { WawaItem } from "./wawa-item";
 import "./wawa-tr";
+import "./wawa-header-tr";
 import { Template } from "lit-html";
 
 @customElement("wawa-table")

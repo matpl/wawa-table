@@ -1,10 +1,16 @@
 # wawa-table
 
+## 0.1.18
+
+### Added
+
+- Add wawa-header-tr component and add resize column feature to it
+
 ## 0.1.17
 
 ### Added
 
-- Added callbacks for providing row / inner row templates
+- Add callbacks for providing row / inner row templates
 
 ## 0.1.16
 
