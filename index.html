@@ -35,15 +35,19 @@
     <body>
         <wawa-table monitor="true" rowHeight="50">
             <template is="header-template">
-                <tr style="font-weight:bold;background-color:#6c7ae0;color:white;height:60px;text-align:left;">
-                    <th style="padding-left:40px;">Name</th>
-                    <th style="padding-left:40px;">Info (table scroll offset: ${table.scrollOffset})</th>
+                <tr is="wawa-header-tr" style="font-weight:bold;background-color:#6c7ae0;color:white;height:60px;text-align:left;">
+                    <th resizable>Name</span></th>
+                    <th>Info (table scroll offset: ${table.scrollOffset})</th>
+                    <th resizable>Wawa</th>
                 </tr>
             </template>
             <template is="row-template">
                 <tr style="height:50px;color:gray;background-color:${index % 2 === 0 ? 'white' : '#f8f6ff'};">
                     <td @click="${item.wawa}" style="padding-left:40px;">
                         ${item.name}
+                    </td>
+                    <td style="padding-left:40px;">
+                        ${index}
                     </td>
                     <td style="padding-left:40px;">
                         ${index}
