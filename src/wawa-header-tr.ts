@@ -98,17 +98,23 @@ export class WawaHeaderTr extends HTMLTableRowElement {
             // Calculate the desired width
             var horizontalScrollOffset = document.documentElement.scrollLeft;
 
+            // first NOT resizable OR THAT HIS OFFSETWIDTH IS NOT THIS.MIN (treat min size headers the same way as unresizable headers?)
+
             // Update the column object with the new size value
             const selectedColumnIndex = this.columns.findIndex((header) => header === this.headerBeingResized);
-            const columnIndex = this.columns.findIndex((header, i) => i <= selectedColumnIndex && header.getAttribute("resizable") !== null); //selectedColumnIndex;
+            let columnIndex = -1;
+            for(let i = selectedColumnIndex; i >= 0; i--) {
+                if(this.columns[i].getAttribute("resizable") !== null) {
+                    columnIndex = i;
+                    break;
+                }
+            }
 
             let width;
-            //console.log(e.clientX);
             if(selectedColumnIndex == columnIndex) {
                 width = horizontalScrollOffset + e.clientX - this.columns[columnIndex].offsetLeft;
             } else if(columnIndex !== -1) {
                 let totalClientX = e.clientX;
-                console.log(columnIndex + " " + selectedColumnIndex);
                 for(let i = columnIndex + 1; i <= selectedColumnIndex; i++) {
                     totalClientX -= this.columns[i].offsetWidth;
                 }
