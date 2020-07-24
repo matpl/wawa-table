@@ -111,7 +111,7 @@ export class WawaHeaderTr extends HTMLTableRowElement {
             }
 
             let width;
-            if(selectedColumnIndex == columnIndex) {
+            if(selectedColumnIndex == columnIndex && selectedColumnIndex !== -1) {
                 width = horizontalScrollOffset + e.clientX - this.columns[columnIndex].offsetLeft;
             } else if(columnIndex !== -1) {
                 let totalClientX = e.clientX;
