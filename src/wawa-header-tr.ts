@@ -14,6 +14,9 @@ export class WawaHeaderTr extends HTMLTableRowElement {
     }
 
     connectedCallback() {
+        if(this.columns.length > 0) {
+            return;
+        }
         let headers = this.querySelectorAll("th");
         this.columns = [];
         let styles = document.createElement("style");
@@ -44,34 +47,20 @@ export class WawaHeaderTr extends HTMLTableRowElement {
             }
         `;
         this.prepend(styles);
-        
-        /*headers.forEach((h, i) => {
-            this.columns.push(h);
-            if(i !== headers.length - 1 && h.getAttribute("resizable") != null) {
-                console.log(i);
-                h.innerHTML += html`
-                    <span class="resize-handle">
-                    </span>
-                `.getHTML();
-
-                h.querySelector('.resize-handle').addEventListener('mousedown', this.initResize.bind(this));
-            }
-        });*/
 
         let resizeHandlesThs = [];
         headers.forEach((h, i) => {
             this.columns.push(h);
             if(h.getAttribute("resizable") != null) {
-                if(i !== 0 && !resizeHandlesThs.includes(i - 1)) {
+                if(i !== 0 && !resizeHandlesThs.includes(i - 1) && !(i - 1 == 0 && headers[i - 1].getAttribute("resizable") == null)) {
                     resizeHandlesThs.push(i - 1);
                 }
-                if(i !== headers.length - 1  && !resizeHandlesThs.includes(i)) {
+                if(i !== headers.length - 1  && !resizeHandlesThs.includes(i) && !(i == headers.length - 2 && headers[i + 1].getAttribute("resizable") == null)) {
                     resizeHandlesThs.push(i);
                 }
             }
         });
         resizeHandlesThs.forEach((i) => {
-            console.log(i);
             headers[i].innerHTML += html`
                     <span class="resize-handle">
                     </span>
@@ -82,7 +71,6 @@ export class WawaHeaderTr extends HTMLTableRowElement {
     }
 
     private initResize({ target }) {
-        console.log('initResize');
 
         this.headerBeingResized = target.parentNode;
         window.addEventListener('mousemove', this.onMouseMove);
@@ -93,8 +81,6 @@ export class WawaHeaderTr extends HTMLTableRowElement {
     private onMouseMove(e) {
         e.preventDefault();
         requestAnimationFrame(() => {
-            console.log('onMouseMove');
-
             // Calculate the desired width
             var horizontalScrollOffset = document.documentElement.scrollLeft;
 
@@ -112,13 +98,13 @@ export class WawaHeaderTr extends HTMLTableRowElement {
 
             let width;
             if(selectedColumnIndex == columnIndex && selectedColumnIndex !== -1) {
-                width = horizontalScrollOffset + e.clientX - this.columns[columnIndex].offsetLeft;
+                width = horizontalScrollOffset + e.clientX - this.columns[columnIndex].getBoundingClientRect().left;
             } else if(columnIndex !== -1) {
                 let totalClientX = e.clientX;
                 for(let i = columnIndex + 1; i <= selectedColumnIndex; i++) {
                     totalClientX -= this.columns[i].offsetWidth;
                 }
-                width = horizontalScrollOffset + totalClientX - this.columns[columnIndex].offsetLeft;
+                width = horizontalScrollOffset + totalClientX - this.columns[columnIndex].getBoundingClientRect().left;
             }
 
             // for all column headers, set the width to its offsetWidth (in case the table size was changed)

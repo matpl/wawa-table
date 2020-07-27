@@ -1,5 +1,11 @@
 # wawa-table
 
+## 0.1.19
+
+### Fixed
+
+- Use element bounding rectangle instead of offsetLeft to find the drag delta
+
 ## 0.1.18
 
 ### Added
