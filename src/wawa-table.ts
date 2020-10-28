@@ -28,7 +28,7 @@ export class WawaTable extends LitElement {
     protected moreItems: boolean = true;
     protected fetching: boolean = false;
     @query("loading-data")
-    private loadingData?: LoadingData;
+    protected loadingData?: LoadingData;
 
     @property({type: Number})
     protected startIndex: number = 0;
@@ -136,7 +136,7 @@ export class WawaTable extends LitElement {
     }
 
     private lastScroll:number = 0;
-    private computeVisibleRows(): void {
+    protected computeVisibleRows(): void {
         let div: HTMLDivElement = this.renderRoot.querySelector("div") as HTMLDivElement;
         let thead: HTMLElement = this.renderRoot.querySelector("thead") as HTMLElement;
         if(this.rowHeight > 0) {
@@ -201,7 +201,7 @@ export class WawaTable extends LitElement {
         super.update(_changedProperties);
     }
 
-    private renderStyles(): TemplateResult {
+    protected renderStyles(): TemplateResult {
         return html`
         <style>
             div {
