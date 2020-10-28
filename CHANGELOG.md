@@ -1,5 +1,11 @@
 # wawa-table
 
+## 0.1.20
+
+### Fixed
+
+- Make some methods protected so they can be overidden
+
 ## 0.1.19
 
 ### Fixed
