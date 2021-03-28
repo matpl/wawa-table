@@ -9,7 +9,8 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "watch": "tsc --watch"
+    "watch": "tsc --watch",
+    "start": "snowpack dev"
   },
   "author": "mplourde",
   "license": "ISC",
@@ -18,6 +19,7 @@
     "lit-html": "^1.0.0"
   },
   "devDependencies": {
+    "snowpack": "^3.1.2",
     "typescript": "^3.4.3"
   },
   "files": [
