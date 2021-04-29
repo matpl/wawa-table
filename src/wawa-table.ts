@@ -46,7 +46,7 @@ export class WawaTable extends LitElement {
     private childObserver: MutationObserver = new MutationObserver(() => { this.loadTemplates(); this.requestUpdate(); });
     public rowTemplate: string = "";
     public innerRowTemplate: string = "";
-    private headerTemplate?: TemplateResult;
+    protected headerTemplate?: TemplateResult;
     private loadingTemplate?: Element[];
 
     @property({type: Object})
@@ -56,10 +56,9 @@ export class WawaTable extends LitElement {
 
     public constructor() {
         super();
-        this.loadTemplates();
     }
 
-    private loadTemplates(): void {
+    protected loadTemplates(): void {
         this.headerTemplate = undefined;
         this.loadingTemplate = undefined;
         this.rowTemplate = "";
@@ -114,7 +113,7 @@ export class WawaTable extends LitElement {
             this.fetchData(this.pageNumber, this.pageSize).then(async items => {
                 this.moreItems = items.length > 0;
                 for(let i: number = 0; i < items.length; i++) {
-                    this.items.push(new WawaItem(items[i], this));
+                    this.pushItem(items[i]);
                 }
                 this.pageNumber++;
                 this.computeVisibleRows();
@@ -126,7 +125,7 @@ export class WawaTable extends LitElement {
                 }
 
                 if(items.length > 0) {
-                    let div: HTMLDivElement = this.renderRoot.querySelector("div") as HTMLDivElement;
+                    let div: HTMLDivElement = this.renderRoot.querySelector("div.table-container") as HTMLDivElement;
                     if(div && div.clientHeight !== 0 && div.scrollHeight <= div.clientHeight + this.rowHeight) {
                         this.fetch();
                     }
@@ -137,8 +136,8 @@ export class WawaTable extends LitElement {
 
     private lastScroll:number = 0;
     protected computeVisibleRows(): void {
-        let div: HTMLDivElement = this.renderRoot.querySelector("div") as HTMLDivElement;
-        let thead: HTMLElement = this.renderRoot.querySelector("thead") as HTMLElement;
+        let div: HTMLDivElement = this.renderRoot.querySelector("div.table-container") as HTMLDivElement;
+        let thead: HTMLElement = this.renderRoot.querySelector("div.table-container thead") as HTMLElement;
         if(this.rowHeight > 0) {
             let visibleRows = Math.ceil(div.clientHeight / this.rowHeight) * 2;
             let startIndex = Math.max(Math.floor((div.scrollTop - thead.clientHeight) / this.rowHeight - this.visibleRows / 4), 0);
@@ -155,6 +154,7 @@ export class WawaTable extends LitElement {
 
     public connectedCallback(): void {
         super.connectedCallback();
+        this.loadTemplates();
 
         if(this.items.length >= this.pageSize) {
             this.computeVisibleRows();
@@ -204,7 +204,7 @@ export class WawaTable extends LitElement {
     protected renderStyles(): TemplateResult {
         return html`
         <style>
-            div {
+            .table-container {
                 height: 100%;
                 overflow-y: auto;
             }
@@ -213,16 +213,16 @@ export class WawaTable extends LitElement {
     }
 
     protected render(): TemplateResult {
-        return html`${this.renderStyles()}<div style="width:100%;" @scroll=${this.onScroll}>
+        return html`${this.renderStyles()}<div class="table-container" style="width:100%;" @scroll=${this.onScroll}>
             <table part="table" style="border-collapse: collapse;width:100%;">
                 <thead part="head">
-                    ${this.headerTemplate}
+                    ${this.composeHeader(this.headerTemplate)}
                 </thead>
                 <tbody part="body">
                     ${this.startIndex > 0 ? html`<tr style="height:${this.startIndex * this.rowHeight}px"></tr>` : html``}
                     ${repeat(this.items, (i) => i.id, (i, index) => {
                         if (index >= this.startIndex && (this.visibleRows == 0 || index < this.startIndex + this.visibleRows)) {
-                            return html`${i.template}`;
+                            return this.composeRow(index, i);
                         } else {
                             return  html``;
                         }
@@ -232,6 +232,32 @@ export class WawaTable extends LitElement {
             </table>
             <loading-data .loadingTemplate=${this.loadingTemplate}></loading-data>
         </div>`;
+    }
+
+
+    /**
+     * Compose the TemplateResult for the header
+     * @param template The header template
+     */
+    protected composeHeader(template: TemplateResult): TemplateResult {
+        return html`${template}`;
+    }
+
+    /**
+     * Compose the TemplateResult for a row
+     * @param index The row index
+     * @param item The item to be rendered
+     */
+    protected composeRow(index: number, item: WawaItem): TemplateResult {
+        return html`${item.template}`;
+    }
+
+    /**
+     * Add an item into the table at last index.
+     * @param item The item to insert into the table
+     */
+    protected pushItem(item: any) {
+        this.items.push(new WawaItem(item, this));
     }
 
     /**
